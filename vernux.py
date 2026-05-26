@@ -27,6 +27,7 @@ from modules.notify         import build_pre_task_notice
 from modules.updater        import run_full_update, check_for_update
 from modules.interpreter    import (
     query as llm_query, is_available as llm_available,
+    query_explain as llm_query_explain,
     select_model, list_installed_models,
     download_model, get_download_advice
 )
@@ -106,11 +107,18 @@ def handle_explain(args_str: str, mode: str):
         print()
         return
 
-    # Offline dict failed — try LLM if available (handles phrases like "what a zombie process is")
+    # Offline dict failed — try LLM explain query if available
     if llm_available():
         print(f"\n  {ui.GRAY}Looking that up with AI...{ui.RESET}\n")
-        llm_result = try_llm_fallback(f"explain {cmd}", mode)
-        if llm_result:
+        with ui.Spinner("Thinking (local AI)"):
+            ai_answer = llm_query_explain(cmd)
+        if ai_answer:
+            print()
+            print(f"  {ui.CYAN}🤖 AI explains:{ui.RESET}")
+            for line in ai_answer.splitlines():
+                if line.strip():
+                    print(f"  {line.strip()}")
+            print()
             return
 
     # Final fallback — show the offline message
