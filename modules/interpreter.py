@@ -381,11 +381,13 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
         cmd += ["--reverse-prompt", st]
 
     # Run with timeout
+    # stderr=DEVNULL suppresses llama.cpp startup banner (version 0/unknown ignores --log-disable)
     try:
         start  = time.time()
         result = subprocess.run(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
             text=True,
             timeout=timeout,
         )
@@ -402,6 +404,87 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
         _set_cached(user_input, command)
 
     return command
+
+
+# ---------------------------------------------------------------------------
+# Explain prompt + query — for natural language explanation queries
+# ---------------------------------------------------------------------------
+
+EXPLAIN_SYSTEM_PROMPT = """You are a helpful assistant for Termux on Android.
+The user wants a plain English explanation. Answer clearly and concisely in 3-5 lines.
+No markdown. No bullet points. No code blocks. Just plain readable text."""
+
+
+def query_explain(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
+    """
+    Query the local LLM for a plain-text explanation (not a bash command).
+    Returns raw model output string, or None on failure.
+    Used by handle_explain() in vernux.py when the offline dict has no answer.
+    """
+    from modules.config import get as config_get
+    from modules.device import load_profile
+
+    if not config_get("llm_enabled", False):
+        return None
+
+    binary = find_llama_cpp()
+    if not binary:
+        return None
+
+    profile   = load_profile()
+    ram_gb    = profile.get("ram", {}).get("total_gb", 2.0)
+    model     = select_model(ram_gb)
+    if model is None:
+        return None
+
+    model_path = get_model_path(model)
+
+    # Build prompt using model's format but with explain system prompt
+    data   = _load_models()
+    fmts   = data.get("prompt_formats", {})
+    fmt_id = model.get("prompt_format", "chatml")
+    fmt    = fmts.get(fmt_id, fmts.get("chatml", {}))
+
+    sp = fmt.get("system_prefix", "")
+    ss = fmt.get("system_suffix", "")
+    up = fmt.get("user_prefix", "")
+    us = fmt.get("user_suffix", "")
+    ap = fmt.get("assistant_prefix", "")
+
+    prompt = f"{sp}{EXPLAIN_SYSTEM_PROMPT}{ss}{up}{user_input}{us}{ap}"
+
+    stop_tokens = data.get("prompt_formats", {}).get(fmt_id, {}).get("stop_tokens", [])
+
+    cmd = [
+        binary,
+        "--model",      model_path,
+        "--prompt",     prompt,
+        "--n-predict",  "200",
+        "--ctx-size",   "2048",
+        "--temp",       "0.3",
+        "--top-p",      "0.9",
+        "--threads",    str(max(1, (profile.get("cpu", {}).get("cores", 2)) - 1)),
+        "--no-display-prompt",
+        "--log-disable",
+    ]
+    for st in stop_tokens:
+        cmd += ["--reverse-prompt", st]
+
+    try:
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=timeout,
+        )
+        raw = result.stdout.strip()
+    except subprocess.TimeoutExpired:
+        return None
+    except Exception:
+        return None
+
+    return raw if raw else None
 
 
 # ---------------------------------------------------------------------------
