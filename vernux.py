@@ -97,8 +97,25 @@ def handle_explain(args_str: str, mode: str):
         else:
             print(f"\n  {ui.GRAY}No commands found for '{query}'{ui.RESET}\n")
         return
+
+    # Try offline dictionary first (works for single known commands)
+    result = explain(cmd, mode)
+    if "I don't have offline documentation" not in result and "not found in offline" not in result:
+        print()
+        print(result)
+        print()
+        return
+
+    # Offline dict failed — try LLM if available (handles phrases like "what a zombie process is")
+    if llm_available():
+        print(f"\n  {ui.GRAY}Looking that up with AI...{ui.RESET}\n")
+        llm_result = try_llm_fallback(f"explain {cmd}", mode)
+        if llm_result:
+            return
+
+    # Final fallback — show the offline message
     print()
-    print(explain(cmd, mode))
+    print(result)
     print()
 
 
