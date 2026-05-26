@@ -27,7 +27,15 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
-## [v0.6.3] — Phase 5 — Hotfix 3 — 2026-05-26
+## [v0.6.4] — Phase 5 — Hotfix 4 — 2026-05-27
+
+### Fixed
+- **llama.cpp banner leaking to terminal** — the full llama.cpp startup UI (build info, model info, available commands, system prompt) was printing directly to the terminal during AI queries. Root cause: `capture_output=True` does not suppress stderr on older Termux llama.cpp builds (version 0/unknown) that ignore `--log-disable`. Fixed by replacing `capture_output=True` with explicit `stdout=subprocess.PIPE, stderr=subprocess.DEVNULL` in both `query()` and the new `query_explain()`.
+- **AI answer silently dropped for explain queries** — `what is JSON`, `what is grep`, and similar explanation queries were running through `validate_output()` which only accepts bash commands matching `VALID_CMD_STARTS`. The model's plain-text answer was always rejected, falling through to "I don't have offline documentation". Fixed by adding a separate `query_explain()` function in `interpreter.py` with its own `EXPLAIN_SYSTEM_PROMPT` (asks for plain English, 3-5 lines) and a dedicated display path in `handle_explain()` that prints the raw AI response directly without command validation.
+
+---
+
+
 
 ### Fixed
 - **`explain` phrase queries ignored AI** — `explain what a zombie process is` and similar natural language explain queries were hitting the offline dict (failing), then showing "I don't have offline documentation" without ever trying the LLM. Now falls back to LLM automatically when offline dict has no result.
