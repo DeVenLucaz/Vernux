@@ -27,6 +27,13 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.6.3] — Phase 5 — Hotfix 3 — 2026-05-26
+
+### Fixed
+- **`explain` phrase queries ignored AI** — `explain what a zombie process is` and similar natural language explain queries were hitting the offline dict (failing), then showing "I don't have offline documentation" without ever trying the LLM. Now falls back to LLM automatically when offline dict has no result.
+
+---
+
 ## [v0.6.2] — Phase 5 — Hotfix 2 — 2026-05-26
 
 ### Fixed
