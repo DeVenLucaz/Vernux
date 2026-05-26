@@ -11,6 +11,7 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import hashlib
 import time
@@ -452,9 +453,8 @@ def download_model(model: dict, on_progress=None) -> bool:
 
     for cmd in [wget_cmd, curl_cmd]:
         tool = cmd[0]
-        # Check tool exists
-        check = subprocess.run(["which", tool], capture_output=True)
-        if check.returncode != 0:
+        # shutil.which works on Termux (no 'which' binary needed)
+        if shutil.which(tool) is None:
             continue
         try:
             proc = subprocess.run(cmd, timeout=7200)
