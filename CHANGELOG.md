@@ -27,6 +27,16 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.6.2] — Phase 5 — Hotfix 2 — 2026-05-26
+
+### Fixed
+- **Model download always failing** — `wget` was missing `-L` (follow redirects) flag; HuggingFace URLs redirect before serving the file, causing silent failure
+- **No curl fallback** — if `wget` unavailable or fails, now retries with `curl -L`
+- **Partial file not validated** — success now requires file exists AND is >1MB; partial downloads cleaned up on failure
+- **Installer banner showed v0.5.0** — hardcoded version string updated to v0.6.1 (now reads from installer correctly)
+
+---
+
 ## [v0.6.1] — Phase 5 — Hotfix — 2026-05-25
 
 ### Fixed

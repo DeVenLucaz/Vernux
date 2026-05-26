@@ -409,8 +409,8 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
 
 def download_model(model: dict, on_progress=None) -> bool:
     """
-    Download a model file to MODELS_DIR using wget.
-    on_progress: optional callback(percent: int)
+    Download a model file to MODELS_DIR using wget (with curl fallback).
+    Follows redirects, retries once on failure, cleans up partial files.
     Returns True on success.
     """
     os.makedirs(MODELS_DIR, exist_ok=True)
@@ -423,22 +423,49 @@ def download_model(model: dict, on_progress=None) -> bool:
     if not url:
         return False
 
-    cmd = [
+    def _cleanup():
+        if os.path.exists(dest):
+            os.remove(dest)
+
+    # Try wget first (follows redirects, shows progress)
+    wget_cmd = [
         "wget",
+        "-L",                      # follow redirects (critical for HuggingFace)
         "--show-progress",
         "--progress=dot:mega",
+        "--tries=2",               # one retry on failure
+        "--timeout=30",            # 30s connect timeout
         "-O", dest,
         url
     ]
 
-    try:
-        proc = subprocess.run(cmd, capture_output=False, timeout=3600)
-        return proc.returncode == 0
-    except Exception:
-        # Clean up partial download
-        if os.path.exists(dest):
-            os.remove(dest)
-        return False
+    # Fallback: curl
+    curl_cmd = [
+        "curl",
+        "-L",                      # follow redirects
+        "--progress-bar",
+        "--retry", "2",
+        "--connect-timeout", "30",
+        "-o", dest,
+        url
+    ]
+
+    for cmd in [wget_cmd, curl_cmd]:
+        tool = cmd[0]
+        # Check tool exists
+        check = subprocess.run(["which", tool], capture_output=True)
+        if check.returncode != 0:
+            continue
+        try:
+            proc = subprocess.run(cmd, timeout=7200)
+            if proc.returncode == 0 and os.path.exists(dest) and os.path.getsize(dest) > 1024 * 1024:
+                return True
+            else:
+                _cleanup()
+        except Exception:
+            _cleanup()
+
+    return False
 
 
 def get_download_advice(model: dict, device_tier: str, mode: str) -> str:
