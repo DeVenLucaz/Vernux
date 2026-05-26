@@ -1,0 +1,23 @@
+{
+  "termux_from_fdroid": {
+    "triggers": ["termux not working", "termux broken", "termux play store", "termux outdated", "pkg install fails all"],
+    "category": "android",
+    "noob": "If Termux is behaving strangely, it might be the Play Store version — which is no longer maintained.\n\n  Solution: Install Termux from F-Droid instead:\n  1. Go to f-droid.org on your phone\n  2. Download and install the F-Droid app\n  3. Search for Termux and install it\n\n  The F-Droid version gets regular updates and works properly.",
+    "learner": "Termux on Play Store hasn't been updated since 2020 and is broken.\n  Install from F-Droid: https://f-droid.org/en/packages/com.termux/\n  Or download the APK directly from GitHub releases.",
+    "pro": "Install from F-Droid or github.com/termux/termux-app/releases. Play Store version is dead."
+  },
+  "x11_gui_setup": {
+    "triggers": ["setup x11", "gui apps termux", "graphical apps termux", "termux x11", "desktop termux"],
+    "category": "android",
+    "noob": "To run apps with windows and buttons in Termux, you need Termux:X11.\n\n  Steps:\n  1. Install Termux:X11 app from F-Droid\n  2. In Termux:\n  $ pkg install x11-repo\n  $ pkg install termux-x11-nightly xfce4\n  3. Start it: $ termux-x11 :1 &\n  4. Open Termux:X11 app on your phone",
+    "learner": "Termux:X11 provides an X11 display server for Termux.\n  $ pkg install x11-repo\n  $ pkg install termux-x11-nightly\n  Then start X: termux-x11 :1 &\n  Set display: export DISPLAY=:1\n  Now GUI apps work.",
+    "pro": "pkg install x11-repo termux-x11-nightly. termux-x11 :1 &. export DISPLAY=:1."
+  },
+  "port_forwarding_adb": {
+    "triggers": ["access termux from pc", "connect pc to termux", "ssh into termux from computer", "remote access termux"],
+    "category": "android",
+    "noob": "You can connect to Termux from your computer over WiFi:\n\n  On your phone in Termux:\n  $ pkg install openssh\n  $ sshd\n  $ whoami  (note your username)\n  $ ip addr show  (note your IP address)\n\n  On your computer:\n  $ ssh username@phone_ip_address -p 8022",
+    "learner": "Termux SSH server runs on port 8022 (not 22).\n  $ pkg install openssh && sshd  # start server\n  $ ssh-keygen  # create key pair for auth\n  Connect from PC: ssh user@phone_ip -p 8022",
+    "pro": "sshd on port 8022. ssh user@phone_ip -p 8022. Or adb forward tcp:8022 tcp:8022."
+  }
+}

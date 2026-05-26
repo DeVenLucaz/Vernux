@@ -1,0 +1,94 @@
+{
+  "_comment": "VERNUX curated model list — bash-focused, small, Q4/Q6 only",
+  "_version": "0.5.0",
+  "models": [
+    {
+      "id": "qwen2.5-coder-1.5b-q4",
+      "name": "Qwen2.5-Coder 1.5B Q4",
+      "description": "Lightweight code model. Fast on low-end devices. Best for simple commands.",
+      "min_ram_gb": 1.0,
+      "recommended_ram_gb": 1.5,
+      "tier": ["micro", "low"],
+      "file": "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",
+      "size_mb": 986,
+      "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",
+      "sha256": null,
+      "context_length": 4096,
+      "prompt_format": "chatml"
+    },
+    {
+      "id": "qwen2.5-coder-1.5b-q6",
+      "name": "Qwen2.5-Coder 1.5B Q6",
+      "description": "Higher quality version of the 1.5B model. Better accuracy, slightly more RAM.",
+      "min_ram_gb": 1.5,
+      "recommended_ram_gb": 2.0,
+      "tier": ["low"],
+      "file": "qwen2.5-coder-1.5b-instruct-q6_k.gguf",
+      "size_mb": 1240,
+      "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q6_k.gguf",
+      "sha256": null,
+      "context_length": 4096,
+      "prompt_format": "chatml"
+    },
+    {
+      "id": "phi4-mini-q4",
+      "name": "Phi-4 Mini Q4",
+      "description": "Microsoft Phi-4 Mini. Strong reasoning, good at bash. Recommended for mid-range devices.",
+      "min_ram_gb": 2.5,
+      "recommended_ram_gb": 4.0,
+      "tier": ["low-mid", "mid"],
+      "file": "phi-4-mini-instruct-q4_k_m.gguf",
+      "size_mb": 2400,
+      "url": "https://huggingface.co/microsoft/Phi-4-mini-instruct-GGUF/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf",
+      "sha256": null,
+      "context_length": 8192,
+      "prompt_format": "phi4"
+    },
+    {
+      "id": "phi4-mini-q6",
+      "name": "Phi-4 Mini Q6",
+      "description": "Higher quality Phi-4 Mini. Best accuracy for bash generation on high-RAM devices.",
+      "min_ram_gb": 4.0,
+      "recommended_ram_gb": 6.0,
+      "tier": ["mid", "high"],
+      "file": "phi-4-mini-instruct-q6_k.gguf",
+      "size_mb": 3100,
+      "url": "https://huggingface.co/microsoft/Phi-4-mini-instruct-GGUF/resolve/main/Phi-4-mini-instruct-Q6_K.gguf",
+      "sha256": null,
+      "context_length": 8192,
+      "prompt_format": "phi4"
+    },
+    {
+      "id": "qwen2.5-coder-3b-q4",
+      "name": "Qwen2.5-Coder 3B Q4",
+      "description": "Larger Qwen coder model. Better at complex multi-step commands. For high-RAM devices.",
+      "min_ram_gb": 2.5,
+      "recommended_ram_gb": 4.0,
+      "tier": ["low-mid", "mid", "high"],
+      "file": "qwen2.5-coder-3b-instruct-q4_k_m.gguf",
+      "size_mb": 1860,
+      "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf",
+      "sha256": null,
+      "context_length": 8192,
+      "prompt_format": "chatml"
+    }
+  ],
+  "prompt_formats": {
+    "chatml": {
+      "system_prefix": "<|im_start|>system\n",
+      "system_suffix": "<|im_end|>\n",
+      "user_prefix":   "<|im_start|>user\n",
+      "user_suffix":   "<|im_end|>\n",
+      "assistant_prefix": "<|im_start|>assistant\n",
+      "stop_tokens": ["<|im_end|>", "<|endoftext|>"]
+    },
+    "phi4": {
+      "system_prefix": "<|system|>\n",
+      "system_suffix": "<|end|>\n",
+      "user_prefix":   "<|user|>\n",
+      "user_suffix":   "<|end|>\n",
+      "assistant_prefix": "<|assistant|>\n",
+      "stop_tokens": ["<|end|>", "<|endoftext|>"]
+    }
+  }
+}

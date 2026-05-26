@@ -1,0 +1,582 @@
+{
+  "_comment": "VERNUX Package Cache \u2014 built by tools/build_db.py",
+  "_version": "0.1.0",
+  "packages": [
+    {
+      "name": "python3",
+      "common_names": [
+        "python",
+        "py",
+        "python3"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 65
+    },
+    {
+      "name": "nodejs",
+      "common_names": [
+        "node",
+        "nodejs",
+        "npm"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 80
+    },
+    {
+      "name": "git",
+      "common_names": [
+        "git"
+      ],
+      "category": "development",
+      "size_estimate_mb": 20
+    },
+    {
+      "name": "ffmpeg",
+      "common_names": [
+        "ffmpeg",
+        "ffmpeg4"
+      ],
+      "category": "media",
+      "size_estimate_mb": 90
+    },
+    {
+      "name": "wget",
+      "common_names": [
+        "wget"
+      ],
+      "category": "network",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "curl",
+      "common_names": [
+        "curl"
+      ],
+      "category": "network",
+      "size_estimate_mb": 3
+    },
+    {
+      "name": "nano",
+      "common_names": [
+        "nano",
+        "text editor"
+      ],
+      "category": "editors",
+      "size_estimate_mb": 4
+    },
+    {
+      "name": "vim",
+      "common_names": [
+        "vim",
+        "vi"
+      ],
+      "category": "editors",
+      "size_estimate_mb": 10
+    },
+    {
+      "name": "zip",
+      "common_names": [
+        "zip"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "unzip",
+      "common_names": [
+        "unzip"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "openssh",
+      "common_names": [
+        "ssh",
+        "openssh",
+        "sshd"
+      ],
+      "category": "network",
+      "size_estimate_mb": 8
+    },
+    {
+      "name": "tmux",
+      "common_names": [
+        "tmux",
+        "screen"
+      ],
+      "category": "terminal",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "zsh",
+      "common_names": [
+        "zsh",
+        "zshell"
+      ],
+      "category": "shell",
+      "size_estimate_mb": 8
+    },
+    {
+      "name": "clang",
+      "common_names": [
+        "gcc",
+        "cc",
+        "clang",
+        "c compiler"
+      ],
+      "category": "development",
+      "size_estimate_mb": 200
+    },
+    {
+      "name": "make",
+      "common_names": [
+        "make"
+      ],
+      "category": "development",
+      "size_estimate_mb": 3
+    },
+    {
+      "name": "rust",
+      "common_names": [
+        "rust",
+        "rustc",
+        "cargo"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 500
+    },
+    {
+      "name": "golang",
+      "common_names": [
+        "go",
+        "golang"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 300
+    },
+    {
+      "name": "php",
+      "common_names": [
+        "php"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 40
+    },
+    {
+      "name": "ruby",
+      "common_names": [
+        "ruby",
+        "gem"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 50
+    },
+    {
+      "name": "perl",
+      "common_names": [
+        "perl"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 30
+    },
+    {
+      "name": "htop",
+      "common_names": [
+        "htop",
+        "top",
+        "task manager"
+      ],
+      "category": "system",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "nmap",
+      "common_names": [
+        "nmap",
+        "network scanner"
+      ],
+      "category": "network",
+      "size_estimate_mb": 15
+    },
+    {
+      "name": "termux-api",
+      "common_names": [
+        "termux-api",
+        "termux api"
+      ],
+      "category": "android",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "tsu",
+      "common_names": [
+        "sudo",
+        "tsu",
+        "superuser"
+      ],
+      "category": "system",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "sqlite",
+      "common_names": [
+        "sqlite",
+        "sqlite3"
+      ],
+      "category": "database",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "mariadb",
+      "common_names": [
+        "mysql",
+        "mariadb"
+      ],
+      "category": "database",
+      "size_estimate_mb": 150
+    },
+    {
+      "name": "nginx",
+      "common_names": [
+        "nginx",
+        "web server"
+      ],
+      "category": "server",
+      "size_estimate_mb": 10
+    },
+    {
+      "name": "apache2",
+      "common_names": [
+        "apache",
+        "apache2",
+        "httpd"
+      ],
+      "category": "server",
+      "size_estimate_mb": 15
+    },
+    {
+      "name": "yt-dlp",
+      "common_names": [
+        "yt-dlp",
+        "youtube-dl",
+        "youtube downloader"
+      ],
+      "category": "media",
+      "size_estimate_mb": 10
+    },
+    {
+      "name": "imagemagick",
+      "common_names": [
+        "imagemagick",
+        "convert",
+        "image editing"
+      ],
+      "category": "media",
+      "size_estimate_mb": 30
+    },
+    {
+      "name": "mpv",
+      "common_names": [
+        "mpv",
+        "media player",
+        "video player"
+      ],
+      "category": "media",
+      "size_estimate_mb": 60
+    },
+    {
+      "name": "cmake",
+      "common_names": [
+        "cmake"
+      ],
+      "category": "development",
+      "size_estimate_mb": 15
+    },
+    {
+      "name": "openjdk-21",
+      "common_names": [
+        "java",
+        "javac",
+        "openjdk",
+        "jdk",
+        "openjdk-21"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 300
+    },
+    {
+      "name": "openjdk-17",
+      "common_names": [
+        "openjdk-17",
+        "java17"
+      ],
+      "category": "programming",
+      "size_estimate_mb": 250
+    },
+    {
+      "name": "ncat",
+      "common_names": [
+        "ncat",
+        "nc",
+        "netcat"
+      ],
+      "category": "network",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "rsync",
+      "common_names": [
+        "rsync"
+      ],
+      "category": "network",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "inetutils",
+      "common_names": [
+        "inetutils",
+        "ping",
+        "ftp",
+        "telnet"
+      ],
+      "category": "network",
+      "size_estimate_mb": 4
+    },
+    {
+      "name": "neovim",
+      "common_names": [
+        "neovim",
+        "nvim"
+      ],
+      "category": "editors",
+      "size_estimate_mb": 20
+    },
+    {
+      "name": "emacs",
+      "common_names": [
+        "emacs"
+      ],
+      "category": "editors",
+      "size_estimate_mb": 80
+    },
+    {
+      "name": "p7zip",
+      "common_names": [
+        "7z",
+        "7zip",
+        "p7zip"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "unrar",
+      "common_names": [
+        "unrar",
+        "rar"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 3
+    },
+    {
+      "name": "gzip",
+      "common_names": [
+        "gzip",
+        "gunzip"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "bzip2",
+      "common_names": [
+        "bzip2",
+        "bunzip2"
+      ],
+      "category": "archives",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "postgresql",
+      "common_names": [
+        "postgres",
+        "postgresql",
+        "psql"
+      ],
+      "category": "database",
+      "size_estimate_mb": 180
+    },
+    {
+      "name": "redis",
+      "common_names": [
+        "redis",
+        "redis-server"
+      ],
+      "category": "database",
+      "size_estimate_mb": 8
+    },
+    {
+      "name": "fish",
+      "common_names": [
+        "fish",
+        "fish shell"
+      ],
+      "category": "shell",
+      "size_estimate_mb": 12
+    },
+    {
+      "name": "bash",
+      "common_names": [
+        "bash"
+      ],
+      "category": "shell",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "btop",
+      "common_names": [
+        "btop",
+        "bpytop"
+      ],
+      "category": "system",
+      "size_estimate_mb": 3
+    },
+    {
+      "name": "proot-distro",
+      "common_names": [
+        "proot-distro",
+        "proot",
+        "ubuntu termux",
+        "linux termux"
+      ],
+      "category": "system",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "openssl",
+      "common_names": [
+        "openssl",
+        "ssl",
+        "tls"
+      ],
+      "category": "security",
+      "size_estimate_mb": 10
+    },
+    {
+      "name": "gnupg",
+      "common_names": [
+        "gpg",
+        "gnupg",
+        "pgp"
+      ],
+      "category": "security",
+      "size_estimate_mb": 15
+    },
+    {
+      "name": "figlet",
+      "common_names": [
+        "figlet",
+        "ascii art"
+      ],
+      "category": "terminal",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "cowsay",
+      "common_names": [
+        "cowsay"
+      ],
+      "category": "terminal",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "lolcat",
+      "common_names": [
+        "lolcat",
+        "rainbow text"
+      ],
+      "category": "terminal",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "speedtest-cli",
+      "common_names": [
+        "speedtest",
+        "speedtest-cli",
+        "internet speed"
+      ],
+      "category": "network",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "nethogs",
+      "common_names": [
+        "nethogs",
+        "network monitor",
+        "bandwidth"
+      ],
+      "category": "network",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "pstree",
+      "common_names": [
+        "pstree",
+        "process tree"
+      ],
+      "category": "system",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "tree",
+      "common_names": [
+        "tree",
+        "folder tree",
+        "directory tree"
+      ],
+      "category": "files",
+      "size_estimate_mb": 1
+    },
+    {
+      "name": "jq",
+      "common_names": [
+        "jq",
+        "json parser",
+        "json tool"
+      ],
+      "category": "files",
+      "size_estimate_mb": 2
+    },
+    {
+      "name": "ripgrep",
+      "common_names": [
+        "rg",
+        "ripgrep",
+        "fast grep"
+      ],
+      "category": "files",
+      "size_estimate_mb": 5
+    },
+    {
+      "name": "fzf",
+      "common_names": [
+        "fzf",
+        "fuzzy finder",
+        "fuzzy search"
+      ],
+      "category": "shell",
+      "size_estimate_mb": 3
+    },
+    {
+      "name": "bat",
+      "common_names": [
+        "bat",
+        "better cat",
+        "syntax highlight cat"
+      ],
+      "category": "files",
+      "size_estimate_mb": 4
+    }
+  ]
+}

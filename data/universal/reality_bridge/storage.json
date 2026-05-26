@@ -1,0 +1,16 @@
+{
+  "storage_full_fix": {
+    "triggers": ["storage full", "no space left", "out of storage", "storage 0", "cannot write disk full"],
+    "category": "storage",
+    "noob": "Your device is out of storage space. Here's how to free some up:\n\n  1. Find big files:\n  $ du -sh ~/* | sort -rh | head -20\n\n  2. Clean package cache:\n  $ pkg autoclean\n\n  3. Remove unused packages:\n  $ pkg autoremove\n\n  4. Delete files you don't need:\n  $ rm filename\n\n  5. Move files to your phone's SD card:\n  $ cp bigfile.zip /sdcard/Download/",
+    "learner": "Free storage strategies:\n  $ pkg autoclean          # remove cached .deb files\n  $ pkg autoremove         # remove orphaned packages\n  $ du -sh ~/* | sort -rh  # find biggest items\n  $ pip cache purge        # clear pip download cache\n  $ npm cache clean --force  # clear npm cache\n  Move large files to /sdcard/Download/",
+    "pro": "pkg autoclean. du -sh ~/* | sort -rh. pip cache purge. npm cache clean. Move to /sdcard."
+  },
+  "sdcard_path_guide": {
+    "triggers": ["sdcard path", "phone storage path", "where is downloads", "path to downloads", "storage symlink"],
+    "category": "storage",
+    "noob": "Your phone's storage folders are available at:\n\n  ~/storage/downloads   →  Downloads folder\n  ~/storage/dcim        →  Camera photos\n  ~/storage/pictures    →  Pictures\n  ~/storage/music       →  Music\n  ~/storage/movies      →  Videos\n  ~/storage/shared      →  Internal storage root\n\n  These are only available after running: termux-setup-storage",
+    "learner": "After termux-setup-storage, symlinks in ~/storage/:\n  downloads, dcim, pictures, music, movies, shared\n  Also accessible as /sdcard/ directly.\n  Example: cp file.txt ~/storage/downloads/",
+    "pro": "~/storage/* symlinks after termux-setup-storage. Direct: /sdcard/path."
+  }
+}

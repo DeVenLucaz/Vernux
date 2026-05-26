@@ -1,0 +1,3260 @@
+{
+  "_comment": "VERNUX Pattern Library \u2014 built by tools/build_db.py",
+  "_version": "0.1.0",
+  "patterns": [
+    {
+      "id": "update_packages",
+      "triggers": [
+        "update packages",
+        "update termux",
+        "update everything",
+        "pkg update"
+      ],
+      "command": "pkg update && pkg upgrade -y",
+      "description_noob": "I'll update all your installed apps and tools to their latest versions.",
+      "description_learner": "pkg update = refresh package list, pkg upgrade = install newer versions of everything installed.",
+      "description_pro": "pkg update && pkg upgrade -y",
+      "example": "pkg update && pkg upgrade -y",
+      "safety": "green",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_python",
+      "triggers": [
+        "install python",
+        "get python",
+        "i need python",
+        "setup python"
+      ],
+      "command": "pkg install python3 -y",
+      "description_noob": "I'll install Python 3 \u2014 the most popular coding language. Takes about 30 seconds.",
+      "description_learner": "In Termux the package is called python3, not python. pkg install fetches and installs it.",
+      "description_pro": "pkg install python3 -y",
+      "example": "pkg install python3 -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall python3",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_git",
+      "triggers": [
+        "install git",
+        "get git",
+        "i need git",
+        "setup git"
+      ],
+      "command": "pkg install git -y",
+      "description_noob": "I'll install Git \u2014 the tool you need to work with GitHub and save your project history.",
+      "description_learner": "Git is version control. After install, you'll need to configure your name and email before committing.",
+      "description_pro": "pkg install git -y",
+      "example": "pkg install git -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall git",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_nodejs",
+      "triggers": [
+        "install nodejs",
+        "install node",
+        "get nodejs",
+        "i need node",
+        "setup nodejs"
+      ],
+      "command": "pkg install nodejs -y",
+      "description_noob": "I'll install Node.js \u2014 used for JavaScript projects and web servers.",
+      "description_learner": "Termux package is 'nodejs' not 'node'. Includes npm automatically.",
+      "description_pro": "pkg install nodejs -y",
+      "example": "pkg install nodejs -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall nodejs",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "setup_storage",
+      "triggers": [
+        "setup storage",
+        "setup termux storage",
+        "grant storage permission",
+        "termux storage permission",
+        "access sdcard",
+        "setup sdcard",
+        "termux setup storage",
+        "allow storage access",
+        "access phone storage",
+        "termux-setup-storage"
+      ],
+      "command": "termux-setup-storage",
+      "description_noob": "I'll ask Android for permission to access your phone's storage (Downloads, Pictures, etc). A popup will appear \u2014 tap Allow.",
+      "description_learner": "termux-setup-storage creates a ~/storage symlink to Android storage locations. Must be run once. Accept the popup.",
+      "description_pro": "termux-setup-storage",
+      "example": "termux-setup-storage",
+      "safety": "green",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "storage",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "copy_to_downloads",
+      "triggers": [
+        "copy to downloads",
+        "save to phone",
+        "move to sdcard",
+        "share file to phone",
+        "copy to sdcard"
+      ],
+      "command": "cp {file} /sdcard/Download/",
+      "description_noob": "I'll copy your file to the Downloads folder on your phone \u2014 where you can find it in the Files app.",
+      "description_learner": "Termux home is sandboxed. /sdcard/Download/ is your phone's Downloads folder accessible to Android apps.",
+      "description_pro": "cp {file} /sdcard/Download/",
+      "example": "cp myfile.txt /sdcard/Download/",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm /sdcard/Download/{file}",
+      "requires": [],
+      "category": "storage",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_current_directory",
+      "triggers": [
+        "where am i",
+        "current directory",
+        "what folder am i in",
+        "show path",
+        "pwd"
+      ],
+      "command": "pwd",
+      "description_noob": "I'll show you exactly where you are in the file system \u2014 like checking which room you're in.",
+      "description_learner": "pwd = print working directory. Shows your full current path.",
+      "description_pro": "pwd",
+      "example": "pwd",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "list_files",
+      "triggers": [
+        "list files",
+        "show files",
+        "ls",
+        "show folder contents",
+        "files here",
+        "what files are here",
+        "show folder",
+        "what is in this folder",
+        "what files are in this folder",
+        "what files here",
+        "display files",
+        "see files"
+      ],
+      "command": "ls -la",
+      "description_noob": "I'll show you all the files and folders here, including hidden ones.",
+      "description_learner": "ls -l = detailed list, -a = include hidden files (starting with dot).",
+      "description_pro": "ls -la",
+      "example": "ls -la",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "make_folder",
+      "triggers": [
+        "make folder",
+        "create folder",
+        "new directory",
+        "mkdir",
+        "create directory",
+        "new folder",
+        "make a folder",
+        "make a new folder",
+        "create a folder",
+        "make directory"
+      ],
+      "command": "mkdir -p {folder_name}",
+      "description_noob": "I'll create a new folder for you.",
+      "description_learner": "mkdir -p creates the folder and any missing parent folders. Safe to run even if it already exists.",
+      "description_pro": "mkdir -p {folder_name}",
+      "example": "mkdir -p myproject",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rmdir {folder_name}",
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "delete_file",
+      "triggers": [
+        "delete file",
+        "remove file",
+        "rm file"
+      ],
+      "command": "rm {filename}",
+      "description_noob": "I'll permanently delete that file. This cannot be undone \u2014 there is no Recycle Bin.",
+      "description_learner": "rm removes a single file permanently. Use rm -r for folders. No undo.",
+      "description_pro": "rm {filename}",
+      "example": "rm oldfile.txt",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "zip_folder",
+      "triggers": [
+        "compress folder",
+        "zip folder",
+        "archive directory",
+        "zip files",
+        "make zip"
+      ],
+      "command": "zip -r {output}.zip {folder}/",
+      "description_noob": "I'll bundle your folder into a single compressed zip file.",
+      "description_learner": "zip -r = recursive (includes subfolders). Output is a .zip archive you can share.",
+      "description_pro": "zip -r {output}.zip {folder}/",
+      "example": "zip -r myproject.zip myproject/",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm {output}.zip",
+      "requires": [
+        "zip"
+      ],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "unzip_file",
+      "triggers": [
+        "unzip file",
+        "extract zip",
+        "extract archive",
+        "unzip"
+      ],
+      "command": "unzip {file}.zip",
+      "description_noob": "I'll unpack the zip file and put all the files into a folder.",
+      "description_learner": "unzip extracts to current directory. Use -d folder to extract to a specific location.",
+      "description_pro": "unzip {file}.zip",
+      "example": "unzip archive.zip",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "unzip"
+      ],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_storage",
+      "triggers": [
+        "free space",
+        "available space",
+        "show storage",
+        "how full",
+        "check how much storage",
+        "show disk",
+        "check storage",
+        "space left",
+        "storage space",
+        "storage remaining",
+        "storage left",
+        "storage usage",
+        "how much storage",
+        "storage have left",
+        "disk space",
+        "storage check",
+        "view storage",
+        "storage free"
+      ],
+      "command": "df -h ~",
+      "description_noob": "I'll show how much storage space is left on your device.",
+      "description_learner": "df -h = disk free, human readable. ~ = your Termux home directory.",
+      "description_pro": "df -h ~",
+      "example": "df -h ~",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_ram",
+      "triggers": [
+        "check ram",
+        "how much ram",
+        "memory usage",
+        "ram left",
+        "free memory"
+      ],
+      "command": "free -h",
+      "description_noob": "I'll show how much memory (RAM) your device has and how much is currently being used.",
+      "description_learner": "free -h shows total, used, and available RAM in human-readable format.",
+      "description_pro": "free -h",
+      "example": "free -h",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_package",
+      "triggers": [
+        "install {package}",
+        "get {package}",
+        "i need {package}",
+        "download {package}"
+      ],
+      "command": "pkg install {package} -y",
+      "description_noob": "I'll install {package} for you. This might take a minute depending on your connection.",
+      "description_learner": "pkg install is Termux's package manager. -y auto-confirms. Package name must be the exact Termux name.",
+      "description_pro": "pkg install {package} -y",
+      "example": "pkg install curl -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall {package}",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "clone_repo",
+      "triggers": [
+        "clone repo",
+        "download repo",
+        "git clone",
+        "clone from github",
+        "clone repository"
+      ],
+      "command": "git clone {url}",
+      "description_noob": "I'll download the entire project from GitHub to your Termux.",
+      "description_learner": "git clone downloads a repository. Creates a folder with the project name. Requires git installed.",
+      "description_pro": "git clone {url}",
+      "example": "git clone https://github.com/user/repo.git",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm -rf {repo_name}",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_status",
+      "triggers": [
+        "git status",
+        "what changed",
+        "show changes",
+        "check git status"
+      ],
+      "command": "git status",
+      "description_noob": "I'll show you which files have changed since your last save.",
+      "description_learner": "git status shows tracked/untracked changes. Run this before committing.",
+      "description_pro": "git status",
+      "example": "git status",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "download_file",
+      "triggers": [
+        "download file",
+        "download url",
+        "wget",
+        "curl download",
+        "get file from url"
+      ],
+      "command": "wget {url}",
+      "description_noob": "I'll download that file from the internet to your current folder.",
+      "description_learner": "wget downloads a file from a URL. Use -O filename.ext to save with a specific name.",
+      "description_pro": "wget {url}",
+      "example": "wget https://example.com/file.zip",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "wget"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_python_script",
+      "triggers": [
+        "run python script",
+        "run python file",
+        "execute python",
+        "python script"
+      ],
+      "command": "python3 {script}.py",
+      "description_noob": "I'll run your Python script.",
+      "description_learner": "python3 executes a .py file. Make sure you're in the right directory first.",
+      "description_pro": "python3 {script}.py",
+      "example": "python3 main.py",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_pip_package",
+      "triggers": [
+        "pip install",
+        "install pip package",
+        "install python package"
+      ],
+      "command": "pip install {package}",
+      "description_noob": "I'll add a Python library that you can use in your scripts.",
+      "description_learner": "pip is Python's package manager. Installs libraries from PyPI. Use pip3 if pip isn't found.",
+      "description_pro": "pip install {package}",
+      "example": "pip install requests",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pip uninstall {package}",
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "clear_terminal",
+      "triggers": [
+        "clear screen",
+        "clear terminal",
+        "cls",
+        "clean screen"
+      ],
+      "command": "clear",
+      "description_noob": "I'll clean up the screen so it's blank again.",
+      "description_learner": "clear scrolls the terminal. Your history is still accessible by scrolling up.",
+      "description_pro": "clear",
+      "example": "clear",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "terminal",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_running_processes",
+      "triggers": [
+        "show processes",
+        "what's running",
+        "running apps",
+        "ps",
+        "process list"
+      ],
+      "command": "ps aux",
+      "description_noob": "I'll show you all the programs running right now in Termux.",
+      "description_learner": "ps aux = process snapshot. a=all users, u=user-friendly, x=include background processes.",
+      "description_pro": "ps aux",
+      "example": "ps aux",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "kill_process",
+      "triggers": [
+        "kill process",
+        "stop process",
+        "kill program",
+        "force stop"
+      ],
+      "command": "kill {pid}",
+      "description_noob": "I'll stop that running program. You'll need the process ID number \u2014 use 'show processes' first to find it.",
+      "description_learner": "kill sends SIGTERM to a process by PID. Use kill -9 if it doesn't respond.",
+      "description_pro": "kill {pid}",
+      "example": "kill 1234",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "change_directory",
+      "triggers": [
+        "go to folder",
+        "change directory",
+        "navigate to",
+        "open folder",
+        "cd"
+      ],
+      "command": "cd {path}",
+      "description_noob": "I'll move you into that folder.",
+      "description_learner": "cd = change directory. Use cd ~ to go home, cd .. to go up one level, cd - to go back.",
+      "description_pro": "cd {path}",
+      "example": "cd myproject",
+      "safety": "green",
+      "reversible": true,
+      "undo": "cd -",
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_file_content",
+      "triggers": [
+        "show file",
+        "read file",
+        "cat file",
+        "display file",
+        "print file"
+      ],
+      "command": "cat {filename}",
+      "description_noob": "I'll display the contents of that file right here in the terminal.",
+      "description_learner": "cat prints file contents to stdout. Use less {file} for long files you can scroll.",
+      "description_pro": "cat {filename}",
+      "example": "cat readme.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_internet",
+      "triggers": [
+        "check internet",
+        "test connection",
+        "am i online",
+        "ping test",
+        "internet connection"
+      ],
+      "command": "ping -c 4 8.8.8.8",
+      "description_noob": "I'll check if your internet connection is working.",
+      "description_learner": "ping sends 4 packets to Google's DNS (8.8.8.8). If you see replies, internet is working.",
+      "description_pro": "ping -c 4 8.8.8.8",
+      "example": "ping -c 4 8.8.8.8",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "make_script_executable",
+      "triggers": [
+        "make executable",
+        "run script",
+        "chmod script",
+        "permission denied script"
+      ],
+      "command": "chmod +x {script}",
+      "description_noob": "I'll give that script permission to run.",
+      "description_learner": "chmod +x adds execute permission. Then run it with ./{script}",
+      "description_pro": "chmod +x {script}",
+      "example": "chmod +x setup.sh",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "chmod -x {script}",
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_nano",
+      "triggers": [
+        "install nano",
+        "get text editor",
+        "install text editor",
+        "text editor termux"
+      ],
+      "command": "pkg install nano -y",
+      "description_noob": "I'll install Nano \u2014 a simple text editor you can use right inside Termux.",
+      "description_learner": "nano is the most beginner-friendly terminal text editor. Open a file: nano filename.txt. Ctrl+X to exit.",
+      "description_pro": "pkg install nano -y",
+      "example": "pkg install nano -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall nano",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "search_package",
+      "triggers": [
+        "search package",
+        "find package",
+        "is package available",
+        "pkg search"
+      ],
+      "command": "pkg search {query}",
+      "description_noob": "I'll search for available packages that match what you're looking for.",
+      "description_learner": "pkg search queries the Termux package index. Shows all matching package names.",
+      "description_pro": "pkg search {query}",
+      "example": "pkg search ffmpeg",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_ffmpeg",
+      "triggers": [
+        "install ffmpeg",
+        "get ffmpeg",
+        "convert video",
+        "video tool"
+      ],
+      "command": "pkg install ffmpeg -y",
+      "description_noob": "I'll install FFmpeg \u2014 a powerful tool for working with video and audio files.",
+      "description_learner": "Termux package is 'ffmpeg' not 'ffmpeg4'. Includes full codec support.",
+      "description_pro": "pkg install ffmpeg -y",
+      "example": "pkg install ffmpeg -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall ffmpeg",
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_init",
+      "triggers": [
+        "create git repo",
+        "setup git repository",
+        "start git",
+        "initialize git",
+        "git setup",
+        "init git",
+        "start git project",
+        "git init",
+        "new git repo"
+      ],
+      "command": "git init",
+      "description_noob": "I'll set up this folder as a Git project so you can track your changes.",
+      "description_learner": "git init creates a .git folder here \u2014 this becomes a local repository.",
+      "description_pro": "git init",
+      "example": "git init",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm -rf .git",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_add_all",
+      "triggers": [
+        "add all files to git",
+        "stage all files",
+        "git add all",
+        "stage all changes",
+        "git add dot",
+        "add all to git",
+        "stage everything"
+      ],
+      "command": "git add .",
+      "description_noob": "I'll mark all your changed files to be saved in the next snapshot.",
+      "description_learner": "git add . stages all changes in the current directory. Run git status after to verify.",
+      "description_pro": "git add .",
+      "example": "git add .",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git reset HEAD .",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_commit",
+      "triggers": [
+        "commit changes",
+        "save changes",
+        "git commit",
+        "make commit"
+      ],
+      "command": "git commit -m \"{message}\"",
+      "description_noob": "I'll save a snapshot of your work with a short description.",
+      "description_learner": "git commit -m saves staged changes with a message. Always stage files first with git add.",
+      "description_pro": "git commit -m \"{message}\"",
+      "example": "git commit -m \"initial commit\"",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git reset --soft HEAD~1",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_push",
+      "triggers": [
+        "push to github",
+        "push changes",
+        "upload to github",
+        "git push"
+      ],
+      "command": "git push",
+      "description_noob": "I'll upload your saved work to GitHub so it's backed up online.",
+      "description_learner": "git push sends your local commits to the remote repository on GitHub.",
+      "description_pro": "git push",
+      "example": "git push",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_pull",
+      "triggers": [
+        "pull from github",
+        "get latest changes",
+        "git pull",
+        "update from github"
+      ],
+      "command": "git pull",
+      "description_noob": "I'll download the latest changes from GitHub to your device.",
+      "description_learner": "git pull fetches and merges remote changes into your current branch.",
+      "description_pro": "git pull",
+      "example": "git pull",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_log",
+      "triggers": [
+        "git log",
+        "show commits",
+        "commit history",
+        "show git history"
+      ],
+      "command": "git log --oneline -10",
+      "description_noob": "I'll show the last 10 saved snapshots of your project.",
+      "description_learner": "git log --oneline shows compact commit history. -10 limits to last 10.",
+      "description_pro": "git log --oneline -10",
+      "example": "git log --oneline -10",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "create_python_venv",
+      "triggers": [
+        "create virtual environment",
+        "python venv",
+        "virtual env",
+        "create venv",
+        "setup venv"
+      ],
+      "command": "python3 -m venv venv",
+      "description_noob": "I'll create a private Python environment just for this project so packages don't clash.",
+      "description_learner": "python3 -m venv creates an isolated Python environment. Activate with: source venv/bin/activate",
+      "description_pro": "python3 -m venv venv",
+      "example": "python3 -m venv venv",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm -rf venv",
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "activate_venv",
+      "triggers": [
+        "activate venv",
+        "activate virtual env",
+        "start venv",
+        "activate environment"
+      ],
+      "command": "source venv/bin/activate",
+      "description_noob": "I'll switch into your project's private Python environment.",
+      "description_learner": "source venv/bin/activate activates the venv. Your prompt changes to show (venv). Use deactivate to exit.",
+      "description_pro": "source venv/bin/activate",
+      "example": "source venv/bin/activate",
+      "safety": "green",
+      "reversible": true,
+      "undo": "deactivate",
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "rename_file",
+      "triggers": [
+        "rename file",
+        "rename folder",
+        "rename directory"
+      ],
+      "command": "mv {old_name} {new_name}",
+      "description_noob": "I'll rename that file or folder for you.",
+      "description_learner": "mv is used for both moving and renaming. The original file name changes to the new one.",
+      "description_pro": "mv {old_name} {new_name}",
+      "example": "mv oldname.txt newname.txt",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "mv {new_name} {old_name}",
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "copy_file",
+      "triggers": [
+        "copy file",
+        "duplicate file",
+        "make copy"
+      ],
+      "command": "cp {source} {destination}",
+      "description_noob": "I'll make a copy of that file.",
+      "description_learner": "cp copies a file. Use cp -r for folders. Original stays untouched.",
+      "description_pro": "cp {source} {destination}",
+      "example": "cp file.txt file_backup.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm {destination}",
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "search_in_files",
+      "triggers": [
+        "search in files",
+        "find text",
+        "grep text",
+        "search for text",
+        "find word in files"
+      ],
+      "command": "grep -r '{text}' .",
+      "description_noob": "I'll search all files in this folder for that word or phrase.",
+      "description_learner": "grep -r searches recursively through all files. Use -i for case-insensitive.",
+      "description_pro": "grep -r '{text}' .",
+      "example": "grep -r 'error' .",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "find_file",
+      "triggers": [
+        "find file",
+        "search for file",
+        "locate file",
+        "where is file"
+      ],
+      "command": "find . -name '{filename}'",
+      "description_noob": "I'll search for that file in this folder and all subfolders.",
+      "description_learner": "find . searches the current directory recursively. -name filters by filename. Use * as wildcard.",
+      "description_pro": "find . -name '{filename}'",
+      "example": "find . -name '*.py'",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "extract_tar",
+      "triggers": [
+        "extract tar",
+        "untar file",
+        "extract tarball",
+        "tar extract"
+      ],
+      "command": "tar -xzf {file}.tar.gz",
+      "description_noob": "I'll extract the contents of that compressed archive.",
+      "description_learner": "tar -xzf extracts a .tar.gz file. x=extract, z=gzip, f=filename. Adds -C dir/ to extract elsewhere.",
+      "description_pro": "tar -xzf {file}.tar.gz",
+      "example": "tar -xzf archive.tar.gz",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "create_tar",
+      "triggers": [
+        "create tar",
+        "tar folder",
+        "compress tar",
+        "make tarball"
+      ],
+      "command": "tar -czf {output}.tar.gz {folder}/",
+      "description_noob": "I'll compress your folder into a .tar.gz archive.",
+      "description_learner": "tar -czf creates a compressed archive. c=create, z=gzip, f=filename.",
+      "description_pro": "tar -czf {output}.tar.gz {folder}/",
+      "example": "tar -czf myproject.tar.gz myproject/",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm {output}.tar.gz",
+      "requires": [],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "start_python_http_server",
+      "triggers": [
+        "start web server",
+        "python server",
+        "http server",
+        "local server",
+        "serve files"
+      ],
+      "command": "python3 -m http.server 8080",
+      "description_noob": "I'll start a local web server on port 8080. Open your browser to http://localhost:8080 to see your files.",
+      "description_learner": "python3 -m http.server serves the current directory over HTTP. Port 8080 by default. Ctrl+C to stop.",
+      "description_pro": "python3 -m http.server 8080",
+      "example": "python3 -m http.server 8080",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_ip_address",
+      "triggers": [
+        "show ip",
+        "my ip address",
+        "what is my ip",
+        "ip address"
+      ],
+      "command": "ip addr show | grep 'inet '",
+      "description_noob": "I'll show your device's IP addresses on the local network.",
+      "description_learner": "ip addr show displays network interfaces. We grep for 'inet ' to show only IPv4 addresses.",
+      "description_pro": "ip addr show | grep 'inet '",
+      "example": "ip addr show | grep 'inet '",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_oh_my_zsh",
+      "triggers": [
+        "install oh my zsh",
+        "setup zsh",
+        "oh-my-zsh",
+        "zsh theme",
+        "make termux look good"
+      ],
+      "command": "pkg install zsh -y && sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"",
+      "description_noob": "I'll install Zsh and Oh My Zsh \u2014 this gives your terminal a much nicer look and useful features.",
+      "description_learner": "Installs zsh shell then Oh My Zsh framework. Adds themes, plugins, and auto-completion. Will prompt to set zsh as default shell.",
+      "description_pro": "pkg install zsh -y && sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"",
+      "example": "see command",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "zsh",
+        "curl"
+      ],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_tmux",
+      "triggers": [
+        "install tmux",
+        "get tmux",
+        "split terminal",
+        "multiple panes",
+        "background sessions"
+      ],
+      "command": "pkg install tmux -y",
+      "description_noob": "I'll install tmux \u2014 it lets you run multiple terminal sessions and keeps things running even if you close Termux.",
+      "description_learner": "tmux is a terminal multiplexer. Sessions survive Termux being closed. Split panes with Ctrl+B then %.",
+      "description_pro": "pkg install tmux -y",
+      "example": "pkg install tmux -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall tmux",
+      "requires": [],
+      "category": "terminal",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_termux_wake_lock",
+      "triggers": [
+        "keep termux awake",
+        "wake lock",
+        "prevent termux killing",
+        "termux wake lock",
+        "stop termux sleeping"
+      ],
+      "command": "termux-wake-lock",
+      "description_noob": "I'll tell Android to keep Termux running even when your screen turns off.",
+      "description_learner": "termux-wake-lock prevents Android from killing Termux in the background. Needs termux-api installed.",
+      "description_pro": "termux-wake-lock",
+      "example": "termux-wake-lock",
+      "safety": "green",
+      "reversible": true,
+      "undo": "termux-wake-unlock",
+      "requires": [
+        "termux-api"
+      ],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_big_files",
+      "triggers": [
+        "find big files",
+        "large files",
+        "biggest files",
+        "what is using space",
+        "disk usage",
+        "most storage",
+        "find large files",
+        "largest files",
+        "big files",
+        "find all big files",
+        "show large files"
+      ],
+      "command": "du -sh ~/* | sort -rh | head -20",
+      "description_noob": "I'll show you the 20 biggest files and folders in your home directory, sorted by size.",
+      "description_learner": "du -sh gets size of each item, sort -rh sorts by human-readable size descending, head -20 limits output.",
+      "description_pro": "du -sh ~/* | sort -rh | head -20",
+      "example": "du -sh ~/* | sort -rh | head -20",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_set_remote",
+      "triggers": [
+        "add remote",
+        "set remote",
+        "git remote add",
+        "connect to github",
+        "add github remote"
+      ],
+      "command": "git remote add origin {url}",
+      "description_noob": "I'll connect this project to your GitHub repository.",
+      "description_learner": "git remote add origin sets the remote URL. Run after git init to connect to GitHub.",
+      "description_pro": "git remote add origin {url}",
+      "example": "git remote add origin https://github.com/user/repo.git",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git remote remove origin",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_set_branch_main",
+      "triggers": [
+        "set main branch",
+        "rename branch main",
+        "git branch main",
+        "default branch main"
+      ],
+      "command": "git branch -M main",
+      "description_noob": "I'll rename the default branch to 'main' \u2014 the modern GitHub standard.",
+      "description_learner": "git branch -M main renames the current branch to main. GitHub default is now 'main' not 'master'.",
+      "description_pro": "git branch -M main",
+      "example": "git branch -M main",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git branch -M master",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_push_upstream",
+      "triggers": [
+        "push set upstream",
+        "git push origin main",
+        "first push github",
+        "push first time"
+      ],
+      "command": "git push -u origin main",
+      "description_noob": "I'll upload your project to GitHub for the first time and connect the branches.",
+      "description_learner": "git push -u origin main sets the upstream tracking. After this, just 'git push' works.",
+      "description_pro": "git push -u origin main",
+      "example": "git push -u origin main",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_undo_last_commit",
+      "triggers": [
+        "undo last commit",
+        "revert commit",
+        "git reset",
+        "undo commit"
+      ],
+      "command": "git reset --soft HEAD~1",
+      "description_noob": "I'll undo your last save but keep all your file changes intact.",
+      "description_learner": "git reset --soft HEAD~1 moves HEAD back one commit but keeps changes staged. --mixed unstages them too.",
+      "description_pro": "git reset --soft HEAD~1",
+      "example": "git reset --soft HEAD~1",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_discard_changes",
+      "triggers": [
+        "discard changes",
+        "undo file changes",
+        "restore file",
+        "git checkout file"
+      ],
+      "command": "git checkout -- {filename}",
+      "description_noob": "I'll throw away the changes to that file and restore it to how it was in your last save.",
+      "description_learner": "git checkout -- file restores a file to its last committed state. Cannot be undone.",
+      "description_pro": "git checkout -- {filename}",
+      "example": "git checkout -- main.py",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_stash",
+      "triggers": [
+        "stash changes",
+        "save changes temporarily",
+        "hide changes",
+        "git stash"
+      ],
+      "command": "git stash",
+      "description_noob": "I'll temporarily hide your unsaved changes so you can do something else, then bring them back later.",
+      "description_learner": "git stash saves uncommitted changes to a stack. git stash pop restores them.",
+      "description_pro": "git stash",
+      "example": "git stash",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git stash pop",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_stash_pop",
+      "triggers": [
+        "restore stash",
+        "bring back stash",
+        "git stash pop",
+        "unstash changes"
+      ],
+      "command": "git stash pop",
+      "description_noob": "I'll bring back the changes you temporarily hid.",
+      "description_learner": "git stash pop restores the most recent stash and removes it from the stack.",
+      "description_pro": "git stash pop",
+      "example": "git stash pop",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "ssh_keygen",
+      "triggers": [
+        "generate ssh key",
+        "create ssh key",
+        "setup ssh",
+        "ssh key github",
+        "ssh keygen"
+      ],
+      "command": "ssh-keygen -t ed25519 -C \"{email}\"",
+      "description_noob": "I'll create an SSH key \u2014 a secure way to connect to GitHub without typing your password every time.",
+      "description_learner": "ssh-keygen creates a public/private key pair. ed25519 is modern and secure. Add ~/.ssh/id_ed25519.pub to GitHub.",
+      "description_pro": "ssh-keygen -t ed25519 -C 'email'",
+      "example": "ssh-keygen -t ed25519 -C 'you@email.com'",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "openssh"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_ssh_pubkey",
+      "triggers": [
+        "show ssh key",
+        "print ssh key",
+        "copy ssh key",
+        "get public key",
+        "cat ssh key"
+      ],
+      "command": "cat ~/.ssh/id_ed25519.pub",
+      "description_noob": "I'll show your public SSH key so you can copy it to GitHub.",
+      "description_learner": "Prints your ed25519 public key. Copy the full output and add it to GitHub \u2192 Settings \u2192 SSH Keys.",
+      "description_pro": "cat ~/.ssh/id_ed25519.pub",
+      "example": "cat ~/.ssh/id_ed25519.pub",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "openssh"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "pip_list",
+      "triggers": [
+        "list python packages",
+        "installed packages pip",
+        "pip list",
+        "what python packages"
+      ],
+      "command": "pip list",
+      "description_noob": "I'll show all the Python libraries installed on your device.",
+      "description_learner": "pip list shows all installed packages with versions. pip freeze > requirements.txt exports them.",
+      "description_pro": "pip list",
+      "example": "pip list",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "pip_freeze",
+      "triggers": [
+        "export requirements",
+        "save requirements",
+        "pip freeze",
+        "requirements txt"
+      ],
+      "command": "pip freeze > requirements.txt",
+      "description_noob": "I'll save a list of all your Python packages to a file so others can install the same ones.",
+      "description_learner": "pip freeze > requirements.txt exports installed packages. Share this file and others run pip install -r requirements.txt.",
+      "description_pro": "pip freeze > requirements.txt",
+      "example": "pip freeze > requirements.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm requirements.txt",
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "pip_install_requirements",
+      "triggers": [
+        "install requirements",
+        "install from requirements",
+        "pip install requirements",
+        "setup project dependencies"
+      ],
+      "command": "pip install -r requirements.txt",
+      "description_noob": "I'll install all the Python packages listed in the requirements file.",
+      "description_learner": "pip install -r requirements.txt installs all packages from a requirements file. Run this after cloning a Python project.",
+      "description_pro": "pip install -r requirements.txt",
+      "example": "pip install -r requirements.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "python_interactive",
+      "triggers": [
+        "open python",
+        "python shell",
+        "python interactive",
+        "python repl",
+        "python interpreter"
+      ],
+      "command": "python3",
+      "description_noob": "I'll open Python's interactive mode where you can type and test code line by line. Type exit() to quit.",
+      "description_learner": "python3 with no arguments opens the REPL. Great for testing expressions. Ctrl+D or exit() to quit.",
+      "description_pro": "python3",
+      "example": "python3",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "npm_init",
+      "triggers": [
+        "init npm project",
+        "create package json",
+        "npm init",
+        "new node project",
+        "setup nodejs project"
+      ],
+      "command": "npm init -y",
+      "description_noob": "I'll set up a new Node.js project in this folder \u2014 creates a package.json file.",
+      "description_learner": "npm init -y creates package.json with defaults. -y skips the questions. Required for any npm project.",
+      "description_pro": "npm init -y",
+      "example": "npm init -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm package.json",
+      "requires": [
+        "nodejs"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "npm_install_package",
+      "triggers": [
+        "npm install",
+        "install npm package",
+        "node package",
+        "add dependency"
+      ],
+      "command": "npm install {package}",
+      "description_noob": "I'll install a JavaScript library for your Node.js project.",
+      "description_learner": "npm install adds a package to node_modules/ and records it in package.json dependencies.",
+      "description_pro": "npm install {package}",
+      "example": "npm install express",
+      "safety": "green",
+      "reversible": true,
+      "undo": "npm uninstall {package}",
+      "requires": [
+        "nodejs"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "npm_run",
+      "triggers": [
+        "npm start",
+        "npm run",
+        "run node script",
+        "start node server",
+        "npm run start"
+      ],
+      "command": "npm start",
+      "description_noob": "I'll start your Node.js project using the start script defined in package.json.",
+      "description_learner": "npm start runs the 'start' script from package.json. npm run scriptname for other scripts.",
+      "description_pro": "npm start",
+      "example": "npm start",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "nodejs"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "count_lines",
+      "triggers": [
+        "count lines",
+        "how many lines",
+        "wc lines",
+        "line count file"
+      ],
+      "command": "wc -l {filename}",
+      "description_noob": "I'll count how many lines are in that file.",
+      "description_learner": "wc -l counts newlines. wc -w counts words. wc -c counts bytes. wc alone gives all three.",
+      "description_pro": "wc -l {filename}",
+      "example": "wc -l main.py",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "sort_file",
+      "triggers": [
+        "sort file",
+        "sort text",
+        "sort lines",
+        "alphabetical sort"
+      ],
+      "command": "sort {filename}",
+      "description_noob": "I'll sort all the lines in that file alphabetically.",
+      "description_learner": "sort outputs lines in alphabetical order. -r reverse, -n numeric, -u unique (remove duplicates), -k field.",
+      "description_pro": "sort {filename}",
+      "example": "sort names.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "unique_lines",
+      "triggers": [
+        "remove duplicates",
+        "unique lines",
+        "uniq",
+        "deduplicate file"
+      ],
+      "command": "sort {filename} | uniq",
+      "description_noob": "I'll remove all duplicate lines from the file, keeping only unique ones.",
+      "description_learner": "uniq removes consecutive duplicates, so sort first. uniq -c counts occurrences. uniq -d shows only duplicates.",
+      "description_pro": "sort {filename} | uniq",
+      "example": "sort data.txt | uniq",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "head_file",
+      "triggers": [
+        "first lines",
+        "top of file",
+        "head file",
+        "show beginning file"
+      ],
+      "command": "head -n 20 {filename}",
+      "description_noob": "I'll show the first 20 lines of that file.",
+      "description_learner": "head -n N shows first N lines. Default is 10. tail -n N shows last N lines. tail -f follows a growing file.",
+      "description_pro": "head -n 20 {filename}",
+      "example": "head -n 20 log.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "tail_file",
+      "triggers": [
+        "last lines",
+        "end of file",
+        "tail file",
+        "show end of file",
+        "tail log"
+      ],
+      "command": "tail -n 20 {filename}",
+      "description_noob": "I'll show the last 20 lines of that file \u2014 useful for reading log files.",
+      "description_learner": "tail -n N shows last N lines. tail -f follows a growing file in real time (great for logs).",
+      "description_pro": "tail -n 20 {filename}",
+      "example": "tail -n 20 server.log",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "follow_log",
+      "triggers": [
+        "follow log",
+        "watch log file",
+        "live log",
+        "tail follow",
+        "real time log"
+      ],
+      "command": "tail -f {logfile}",
+      "description_noob": "I'll watch that log file and show new lines as they appear \u2014 live. Press Ctrl+C to stop.",
+      "description_learner": "tail -f follows a file in real time. Great for watching server logs. Ctrl+C to stop.",
+      "description_pro": "tail -f {logfile}",
+      "example": "tail -f server.log",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "write_to_file",
+      "triggers": [
+        "write to file",
+        "save text to file",
+        "create file with content",
+        "echo to file"
+      ],
+      "command": "echo '{text}' > {filename}",
+      "description_noob": "I'll create a file and write your text into it. Warning: this will overwrite if the file already exists.",
+      "description_learner": "echo 'text' > file creates/overwrites. echo 'text' >> file appends. Use cat << EOF for multi-line.",
+      "description_pro": "echo '{text}' > {filename}",
+      "example": "echo 'hello world' > greeting.txt",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "append_to_file",
+      "triggers": [
+        "append to file",
+        "add to file",
+        "echo append",
+        "add line to file"
+      ],
+      "command": "echo '{text}' >> {filename}",
+      "description_noob": "I'll add your text to the end of that file without overwriting what's already there.",
+      "description_learner": ">> appends to file. > overwrites. echo 'text' >> file adds a line at the end.",
+      "description_pro": "echo '{text}' >> {filename}",
+      "example": "echo 'new line' >> myfile.txt",
+      "safety": "green",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_file_size",
+      "triggers": [
+        "file size",
+        "how big is file",
+        "size of file",
+        "check file size"
+      ],
+      "command": "du -sh {filename}",
+      "description_noob": "I'll show how large that file is.",
+      "description_learner": "du -sh shows file/directory size. -s summary, -h human-readable. du -sh * shows all items in current dir.",
+      "description_pro": "du -sh {filename}",
+      "example": "du -sh video.mp4",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_open_ports",
+      "triggers": [
+        "open ports",
+        "listening ports",
+        "what ports",
+        "check ports",
+        "netstat ports"
+      ],
+      "command": "ss -tlnp",
+      "description_noob": "I'll show which ports on your device are currently listening for connections.",
+      "description_learner": "ss -tlnp shows TCP listening ports. -t=TCP, -l=listening, -n=numeric, -p=process. Replaces netstat.",
+      "description_pro": "ss -tlnp",
+      "example": "ss -tlnp",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_network_interfaces",
+      "triggers": [
+        "network interfaces",
+        "show networks",
+        "wifi ip",
+        "ip address list",
+        "ifconfig"
+      ],
+      "command": "ip addr show",
+      "description_noob": "I'll show all your network connections and their IP addresses.",
+      "description_learner": "ip addr show lists all network interfaces. inet = IPv4, inet6 = IPv6. Look for wlan0 for WiFi.",
+      "description_pro": "ip addr show",
+      "example": "ip addr show",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "curl_api",
+      "triggers": [
+        "make api request",
+        "curl api",
+        "test api",
+        "http request",
+        "get request"
+      ],
+      "command": "curl -s {url}",
+      "description_noob": "I'll make a request to that web address and show you what it returns.",
+      "description_learner": "curl -s (silent) fetches a URL. Add | python3 -m json.tool to pretty-print JSON responses.",
+      "description_pro": "curl -s {url}",
+      "example": "curl -s https://api.github.com/user",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "curl"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "download_with_progress",
+      "triggers": [
+        "download show progress",
+        "wget progress",
+        "download file progress",
+        "curl progress"
+      ],
+      "command": "wget --show-progress {url}",
+      "description_noob": "I'll download that file and show you a progress bar.",
+      "description_learner": "wget --show-progress displays a download bar. -c resumes interrupted downloads. -O renames the output file.",
+      "description_pro": "wget --show-progress {url}",
+      "example": "wget --show-progress https://example.com/file.zip",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "wget"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_environment",
+      "triggers": [
+        "environment variables",
+        "show env",
+        "env variables",
+        "printenv",
+        "show path"
+      ],
+      "command": "env",
+      "description_noob": "I'll show all the environment settings that your programs can see.",
+      "description_learner": "env shows all environment variables. echo $VARIABLE for a specific one. Common: $HOME, $PATH, $USER.",
+      "description_pro": "env or printenv. echo $VAR for specific.",
+      "example": "env",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_path",
+      "triggers": [
+        "show path variable",
+        "what is path",
+        "PATH variable",
+        "echo path"
+      ],
+      "command": "echo $PATH",
+      "description_noob": "I'll show which folders your device looks in when you type a command name.",
+      "description_learner": "$PATH is a colon-separated list of directories searched for executables. Add to PATH in ~/.bashrc.",
+      "description_pro": "echo $PATH",
+      "example": "echo $PATH",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "make_alias",
+      "triggers": [
+        "create alias",
+        "make shortcut command",
+        "alias command",
+        "shortcut for command"
+      ],
+      "command": "echo \"alias {name}='{command}'\" >> ~/.bashrc && source ~/.bashrc",
+      "description_noob": "I'll create a shortcut so you can type a short word instead of the full command.",
+      "description_learner": "Adds alias to ~/.bashrc so it persists across sessions. source reloads bashrc immediately.",
+      "description_pro": "echo \"alias {name}='{command}'\" >> ~/.bashrc && source ~/.bashrc",
+      "example": "echo \"alias ll='ls -la'\" >> ~/.bashrc && source ~/.bashrc",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "Remove the alias line from ~/.bashrc",
+      "requires": [],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "edit_bashrc",
+      "triggers": [
+        "edit bashrc",
+        "open bashrc",
+        "nano bashrc",
+        "configure shell",
+        "shell config"
+      ],
+      "command": "nano ~/.bashrc",
+      "description_noob": "I'll open your shell configuration file where you can add custom settings and shortcuts.",
+      "description_learner": "~/.bashrc runs on every new bash session. Add aliases, exports, PATH changes here. source ~/.bashrc to apply changes.",
+      "description_pro": "nano ~/.bashrc",
+      "example": "nano ~/.bashrc",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "nano"
+      ],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "reload_shell",
+      "triggers": [
+        "reload shell",
+        "apply bashrc",
+        "source bashrc",
+        "refresh terminal settings"
+      ],
+      "command": "source ~/.bashrc",
+      "description_noob": "I'll apply any changes you made to your shell settings without needing to restart Termux.",
+      "description_learner": "source ~/.bashrc reloads your shell config. Equivalent to opening a new terminal session.",
+      "description_pro": "source ~/.bashrc",
+      "example": "source ~/.bashrc",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "termux_wake_lock",
+      "triggers": [
+        "keep termux running",
+        "wake lock",
+        "prevent kill",
+        "keep alive",
+        "screen off termux"
+      ],
+      "command": "termux-wake-lock",
+      "description_noob": "I'll tell Android to keep Termux running even when your screen turns off \u2014 important for long tasks.",
+      "description_learner": "termux-wake-lock acquires an Android wake lock. Prevents background kill. Release with termux-wake-unlock.",
+      "description_pro": "termux-wake-lock",
+      "example": "termux-wake-lock",
+      "safety": "green",
+      "reversible": true,
+      "undo": "termux-wake-unlock",
+      "requires": [
+        "termux-api"
+      ],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "termux_battery_status",
+      "triggers": [
+        "battery status",
+        "check battery",
+        "battery level termux"
+      ],
+      "command": "termux-battery-status",
+      "description_noob": "I'll show your battery level and charging status.",
+      "description_learner": "termux-battery-status returns JSON with percentage, status, plugged. Needs termux-api package.",
+      "description_pro": "termux-battery-status",
+      "example": "termux-battery-status",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "termux-api"
+      ],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "termux_notification",
+      "triggers": [
+        "send notification",
+        "termux notify",
+        "push notification",
+        "android notification"
+      ],
+      "command": "termux-notification --title '{title}' --content '{message}'",
+      "description_noob": "I'll send a notification to your phone from the terminal.",
+      "description_learner": "termux-notification creates an Android notification. Needs termux-api. --ongoing keeps it persistent.",
+      "description_pro": "termux-notification --title 'T' --content 'M'",
+      "example": "termux-notification --title 'Done' --content 'Build complete'",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "termux-api"
+      ],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "termux_share",
+      "triggers": [
+        "share file",
+        "send file android",
+        "share with app",
+        "termux share file"
+      ],
+      "command": "termux-share {filename}",
+      "description_noob": "I'll open the Android share menu so you can send that file to WhatsApp, email, Drive, etc.",
+      "description_learner": "termux-share opens Android intent chooser for a file. Needs termux-api package.",
+      "description_pro": "termux-share {filename}",
+      "example": "termux-share report.pdf",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "termux-api"
+      ],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_termux_api_installed",
+      "triggers": [
+        "install termux api",
+        "termux-api not found",
+        "termux api missing",
+        "install termux:api"
+      ],
+      "command": "pkg install termux-api -y",
+      "description_noob": "I'll install the Termux API package. You also need to install the 'Termux:API' companion app from F-Droid on your phone.",
+      "description_learner": "termux-api package provides Android hardware access (battery, notifications, camera, etc). Requires Termux:API app from F-Droid too.",
+      "description_pro": "pkg install termux-api -y",
+      "example": "pkg install termux-api -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall termux-api",
+      "requires": [],
+      "category": "android",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "download_youtube",
+      "triggers": [
+        "download youtube",
+        "download video",
+        "yt-dlp",
+        "youtube download",
+        "download audio"
+      ],
+      "command": "yt-dlp {url}",
+      "description_noob": "I'll download that video. Make sure yt-dlp is installed first (pkg install yt-dlp).",
+      "description_learner": "yt-dlp downloads from YouTube and 1000+ other sites. -x --audio-format mp3 for audio only. -f best for best quality.",
+      "description_pro": "yt-dlp {url}",
+      "example": "yt-dlp https://youtu.be/videoID",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "yt-dlp"
+      ],
+      "category": "media",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "download_youtube_audio",
+      "triggers": [
+        "download audio only",
+        "download mp3",
+        "youtube to mp3",
+        "extract audio video"
+      ],
+      "command": "yt-dlp -x --audio-format mp3 {url}",
+      "description_noob": "I'll download just the audio from that video as an MP3 file.",
+      "description_learner": "yt-dlp -x extracts audio. --audio-format mp3 converts to MP3. Needs ffmpeg installed too.",
+      "description_pro": "yt-dlp -x --audio-format mp3 {url}",
+      "example": "yt-dlp -x --audio-format mp3 https://youtu.be/id",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "yt-dlp",
+        "ffmpeg"
+      ],
+      "category": "media",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "convert_video",
+      "triggers": [
+        "convert video",
+        "ffmpeg convert",
+        "change video format",
+        "compress video"
+      ],
+      "command": "ffmpeg -i {input} {output}",
+      "description_noob": "I'll convert that video file to a different format.",
+      "description_learner": "ffmpeg -i input output. Format determined by output extension. Add -crf 28 to compress. -vn for audio only.",
+      "description_pro": "ffmpeg -i {input} {output}",
+      "example": "ffmpeg -i video.mp4 video.avi",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "ffmpeg"
+      ],
+      "category": "media",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "open_sqlite",
+      "triggers": [
+        "open sqlite",
+        "sqlite3",
+        "create database",
+        "sqlite database"
+      ],
+      "command": "sqlite3 {database}.db",
+      "description_noob": "I'll open a SQLite database (or create one if it doesn't exist yet).",
+      "description_learner": "sqlite3 opens an interactive SQLite shell. .tables shows tables. .quit exits. .schema shows structure.",
+      "description_pro": "sqlite3 {database}.db",
+      "example": "sqlite3 myapp.db",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "sqlite"
+      ],
+      "category": "database",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "word_count",
+      "triggers": [
+        "count words",
+        "word count",
+        "wc words",
+        "how many words"
+      ],
+      "command": "wc -w {filename}",
+      "description_noob": "I'll count how many words are in that file.",
+      "description_learner": "wc -w counts words. wc -l lines. wc -c bytes. wc -m characters.",
+      "description_pro": "wc -w {filename}",
+      "example": "wc -w essay.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "replace_text",
+      "triggers": [
+        "replace text",
+        "find and replace",
+        "sed replace",
+        "substitute text"
+      ],
+      "command": "sed -i 's/{old}/{new}/g' {filename}",
+      "description_noob": "I'll find every occurrence of that word in the file and replace it with the new one.",
+      "description_learner": "sed -i in-place edit. s/old/new/g = substitute all occurrences. Without -i, prints to stdout instead.",
+      "description_pro": "sed -i 's/{old}/{new}/g' {filename}",
+      "example": "sed -i 's/hello/world/g' file.txt",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "disk_usage_summary",
+      "triggers": [
+        "disk usage",
+        "storage usage",
+        "how much space used",
+        "df usage"
+      ],
+      "command": "df -h && du -sh ~",
+      "description_noob": "I'll show overall storage and how much your Termux home folder is using.",
+      "description_learner": "df -h shows filesystem usage. du -sh ~ shows your home dir size. Combine for a full picture.",
+      "description_pro": "df -h && du -sh ~",
+      "example": "df -h && du -sh ~",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "system_info",
+      "triggers": [
+        "system info",
+        "device info",
+        "phone info",
+        "uname info",
+        "about device"
+      ],
+      "command": "uname -a && free -h && df -h ~",
+      "description_noob": "I'll show you basic information about your device and system.",
+      "description_learner": "uname -a = kernel info, free -h = RAM, df -h ~ = storage. Useful quick system overview.",
+      "description_pro": "uname -a && free -h && df -h ~",
+      "example": "uname -a && free -h && df -h ~",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_build_tools",
+      "triggers": [
+        "install build tools",
+        "build essentials",
+        "install clang",
+        "compile c",
+        "c compiler"
+      ],
+      "command": "pkg install clang make cmake -y",
+      "description_noob": "I'll install the tools needed to compile C and C++ code.",
+      "description_learner": "clang is Termux's C/C++ compiler (gcc isn't available). make and cmake are build systems.",
+      "description_pro": "pkg install clang make cmake -y",
+      "example": "pkg install clang make cmake -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall clang make cmake",
+      "requires": [],
+      "category": "development",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_proot",
+      "triggers": [
+        "install proot",
+        "linux on termux",
+        "full linux termux",
+        "ubuntu termux",
+        "debian termux"
+      ],
+      "command": "pkg install proot-distro -y",
+      "description_noob": "I'll install proot-distro which lets you run a full Linux system (Ubuntu, Debian, etc.) inside Termux.",
+      "description_learner": "proot-distro provides Linux distros in Termux via proot. Run: proot-distro install ubuntu, then proot-distro login ubuntu.",
+      "description_pro": "pkg install proot-distro -y",
+      "example": "pkg install proot-distro -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall proot-distro",
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_command_exists",
+      "triggers": [
+        "is installed",
+        "check if installed",
+        "command exists",
+        "which command",
+        "where is"
+      ],
+      "command": "which {command}",
+      "description_noob": "I'll check if that tool is installed and show you where it's located.",
+      "description_learner": "which shows the path of an executable. Exit code 0 = found, 1 = not found. command -v is more portable.",
+      "description_pro": "which {command}",
+      "example": "which python3",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "view_command_history",
+      "triggers": [
+        "command history",
+        "recent commands",
+        "what did i type",
+        "history commands"
+      ],
+      "command": "history | tail -20",
+      "description_noob": "I'll show the last 20 commands you typed.",
+      "description_learner": "history shows all past commands. Pipe to tail to limit. Ctrl+R for interactive reverse search.",
+      "description_pro": "history | tail -20",
+      "example": "history | tail -20",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_command_as_root",
+      "triggers": [
+        "run as root",
+        "sudo command",
+        "tsu",
+        "need root",
+        "root access"
+      ],
+      "command": "tsu",
+      "description_noob": "I'll try to give you root access. Note: this requires your device to be rooted.",
+      "description_learner": "tsu is Termux's sudo equivalent. Requires a rooted device. pkg install tsu first.",
+      "description_pro": "tsu",
+      "example": "tsu",
+      "safety": "red",
+      "reversible": true,
+      "undo": "exit",
+      "requires": [
+        "tsu"
+      ],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "update_termux_repos",
+      "triggers": [
+        "fix repo",
+        "broken packages",
+        "update package list",
+        "pkg update error",
+        "repository error"
+      ],
+      "command": "pkg update -y",
+      "description_noob": "I'll refresh the list of available packages. Run this if package installs are failing.",
+      "description_learner": "pkg update refreshes the package index from Termux repos. Run before installing if you get 'not found' errors.",
+      "description_pro": "pkg update -y",
+      "example": "pkg update -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "cleanup_packages",
+      "triggers": [
+        "clean packages",
+        "remove old packages",
+        "pkg clean",
+        "free up package space",
+        "autoclean"
+      ],
+      "command": "pkg autoclean",
+      "description_noob": "I'll clean up old downloaded package files to free up space.",
+      "description_learner": "pkg autoclean removes cached .deb files. pkg clean removes all cached files. Frees storage without removing packages.",
+      "description_pro": "pkg autoclean",
+      "example": "pkg autoclean",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "list_installed_packages",
+      "triggers": [
+        "list installed packages",
+        "what is installed",
+        "installed tools",
+        "pkg list",
+        "show installed"
+      ],
+      "command": "pkg list-installed",
+      "description_noob": "I'll show all the tools and packages currently installed in Termux.",
+      "description_learner": "pkg list-installed shows all installed packages. Pipe to grep to filter: pkg list-installed | grep python.",
+      "description_pro": "pkg list-installed",
+      "example": "pkg list-installed",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_package_info",
+      "triggers": [
+        "package info",
+        "about package",
+        "pkg show",
+        "what does package do"
+      ],
+      "command": "pkg show {package}",
+      "description_noob": "I'll show information about that package \u2014 what it does, its size, and what it needs.",
+      "description_learner": "pkg show displays package metadata: version, size, dependencies, description.",
+      "description_pro": "pkg show {package}",
+      "example": "pkg show python3",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "go_home",
+      "triggers": [
+        "go home",
+        "home directory",
+        "cd home",
+        "back to home"
+      ],
+      "command": "cd ~",
+      "description_noob": "I'll take you back to your home folder.",
+      "description_learner": "cd ~ navigates to $HOME (/data/data/com.termux/files/home in Termux).",
+      "description_pro": "cd ~",
+      "example": "cd ~",
+      "safety": "green",
+      "reversible": true,
+      "undo": "cd -",
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "go_up",
+      "triggers": [
+        "go up",
+        "parent folder",
+        "one folder up",
+        "cd up",
+        "back one folder"
+      ],
+      "command": "cd ..",
+      "description_noob": "I'll move you up one folder level.",
+      "description_learner": "cd .. navigates to the parent directory. cd ../.. goes up two levels.",
+      "description_pro": "cd ..",
+      "example": "cd ..",
+      "safety": "green",
+      "reversible": true,
+      "undo": "cd -",
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "make_script",
+      "triggers": [
+        "create bash script",
+        "new shell script",
+        "make script",
+        "create sh file",
+        "write shell script"
+      ],
+      "command": "nano {name}.sh",
+      "description_noob": "I'll open a text editor so you can write a new shell script.",
+      "description_learner": "Creates a .sh file in nano. Start with #!/bin/bash on the first line. Ctrl+O save, Ctrl+X exit. Then chmod +x to run.",
+      "description_pro": "nano {name}.sh",
+      "example": "nano setup.sh",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "nano"
+      ],
+      "category": "shell",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "print_working_dir",
+      "triggers": [
+        "where am i",
+        "current location",
+        "which folder",
+        "what directory",
+        "my location"
+      ],
+      "command": "pwd",
+      "description_noob": "I'll show you exactly which folder you're currently in.",
+      "description_learner": "pwd = print working directory. Always run this if you're unsure where you are.",
+      "description_pro": "pwd",
+      "example": "pwd",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "navigation",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "open_file_nano",
+      "triggers": [
+        "open file",
+        "edit file",
+        "nano file",
+        "edit with nano",
+        "write to file nano"
+      ],
+      "command": "nano {filename}",
+      "description_noob": "I'll open that file in the Nano text editor. Ctrl+O to save, Ctrl+X to exit.",
+      "description_learner": "nano filename opens for editing. Ctrl+W search, Ctrl+G help, Ctrl+K cut line, Ctrl+U paste.",
+      "description_pro": "nano {filename}",
+      "example": "nano config.json",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "nano"
+      ],
+      "category": "editors",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "extract_zip_here",
+      "triggers": [
+        "extract here",
+        "unzip here",
+        "extract to current folder",
+        "unzip to this folder"
+      ],
+      "command": "unzip {file}.zip -d .",
+      "description_noob": "I'll extract the zip file into the current folder.",
+      "description_learner": "unzip -d . extracts to current directory. Use -d foldername to extract into a specific folder.",
+      "description_pro": "unzip {file}.zip -d .",
+      "example": "unzip project.zip -d .",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "unzip"
+      ],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "list_zip_contents",
+      "triggers": [
+        "list zip contents",
+        "what is in zip",
+        "zip contents",
+        "show zip files",
+        "peek inside zip"
+      ],
+      "command": "unzip -l {file}.zip",
+      "description_noob": "I'll show what files are inside the zip without extracting them.",
+      "description_learner": "unzip -l lists archive contents without extracting. Useful for checking before extract.",
+      "description_pro": "unzip -l {file}.zip",
+      "example": "unzip -l archive.zip",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "unzip"
+      ],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "compress_with_password",
+      "triggers": [
+        "zip with password",
+        "encrypt zip",
+        "password protected zip",
+        "secure zip"
+      ],
+      "command": "zip -e {output}.zip {files}",
+      "description_noob": "I'll create a zip file that requires a password to open.",
+      "description_learner": "zip -e encrypts the archive with a password. You'll be prompted to set it.",
+      "description_pro": "zip -e {output}.zip {files}",
+      "example": "zip -e secure.zip documents/",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "zip"
+      ],
+      "category": "archives",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "test_port",
+      "triggers": [
+        "test port",
+        "is port open",
+        "check port",
+        "port listening"
+      ],
+      "command": "nc -zv {host} {port}",
+      "description_noob": "I'll check if a specific port is open and reachable on that address.",
+      "description_learner": "nc -zv = netcat zero-I/O verbose. Tests TCP connectivity to host:port. Exit 0 = open.",
+      "description_pro": "nc -zv {host} {port}",
+      "example": "nc -zv localhost 8080",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "ncat"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "ssh_copy_file",
+      "triggers": [
+        "copy file ssh",
+        "upload file server",
+        "scp file",
+        "transfer file ssh"
+      ],
+      "command": "scp {file} {user}@{host}:{path}",
+      "description_noob": "I'll copy a file to another computer over SSH.",
+      "description_learner": "scp = secure copy over SSH. Same syntax as cp but with user@host:path for remote side.",
+      "description_pro": "scp {file} user@host:path",
+      "example": "scp backup.tar.gz user@192.168.1.1:~/",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "openssh"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "http_post_request",
+      "triggers": [
+        "post request",
+        "curl post",
+        "send json",
+        "api post",
+        "http post"
+      ],
+      "command": "curl -X POST -H 'Content-Type: application/json' -d '{data}' {url}",
+      "description_noob": "I'll send data to a web API using an HTTP POST request.",
+      "description_learner": "curl -X POST sends POST. -H sets headers. -d is the data body. Use -s for silent mode.",
+      "description_pro": "curl -X POST -H 'Content-Type: application/json' -d '{data}' {url}",
+      "example": "curl -X POST -H 'Content-Type: application/json' -d '{\"key\":\"val\"}' https://api.example.com",
+      "safety": "yellow",
+      "reversible": false,
+      "undo": null,
+      "requires": [
+        "curl"
+      ],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_in_background",
+      "triggers": [
+        "run in background",
+        "background process",
+        "detach process",
+        "ampersand run",
+        "nohup"
+      ],
+      "command": "nohup {command} &",
+      "description_noob": "I'll run that command in the background so you can keep using the terminal.",
+      "description_learner": "nohup prevents HUP signal from killing the process. & runs it in background. Output goes to nohup.out.",
+      "description_pro": "nohup {command} &",
+      "example": "nohup python3 server.py &",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "kill %1",
+      "requires": [],
+      "category": "processes",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_background_jobs",
+      "triggers": [
+        "show background jobs",
+        "list jobs",
+        "what is running background",
+        "jobs list"
+      ],
+      "command": "jobs",
+      "description_noob": "I'll show any commands currently running in the background.",
+      "description_learner": "jobs shows background processes. fg brings one to foreground. bg resumes stopped job. kill %N kills job N.",
+      "description_pro": "jobs",
+      "example": "jobs",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "processes",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "bring_to_foreground",
+      "triggers": [
+        "bring to foreground",
+        "fg job",
+        "resume command",
+        "foreground process"
+      ],
+      "command": "fg",
+      "description_noob": "I'll bring the background command back to the front so you can see it.",
+      "description_learner": "fg resumes the most recent background/stopped job. fg %2 for specific job number.",
+      "description_pro": "fg",
+      "example": "fg",
+      "safety": "green",
+      "reversible": true,
+      "undo": "Ctrl+Z",
+      "requires": [],
+      "category": "processes",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_remote_list",
+      "triggers": [
+        "show remotes",
+        "list remotes",
+        "git remote",
+        "what remotes",
+        "github url"
+      ],
+      "command": "git remote -v",
+      "description_noob": "I'll show which GitHub/remote repositories this project is connected to.",
+      "description_learner": "git remote -v shows all remotes with their fetch/push URLs. origin is the default remote name.",
+      "description_pro": "git remote -v",
+      "example": "git remote -v",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_branch_list",
+      "triggers": [
+        "list branches",
+        "show branches",
+        "git branch list",
+        "all branches",
+        "what branches"
+      ],
+      "command": "git branch -a",
+      "description_noob": "I'll show all the branches in this project, including ones on GitHub.",
+      "description_learner": "git branch -a shows local and remote branches. -r shows only remote. Active branch marked with *.",
+      "description_pro": "git branch -a",
+      "example": "git branch -a",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_merge",
+      "triggers": [
+        "merge branch",
+        "git merge",
+        "combine branches",
+        "merge into main"
+      ],
+      "command": "git merge {branch}",
+      "description_noob": "I'll combine another branch's changes into your current branch.",
+      "description_learner": "git merge integrates changes from another branch. Creates a merge commit. Resolve conflicts if they appear.",
+      "description_pro": "git merge {branch}",
+      "example": "git merge feature-login",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "git merge --abort",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_fetch",
+      "triggers": [
+        "git fetch",
+        "fetch changes",
+        "download changes without merge",
+        "update remote refs"
+      ],
+      "command": "git fetch",
+      "description_noob": "I'll download the latest information from GitHub without changing your files.",
+      "description_learner": "git fetch downloads remote changes without merging. Safer than pull. Then git merge or git rebase manually.",
+      "description_pro": "git fetch",
+      "example": "git fetch",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "git_tag",
+      "triggers": [
+        "create tag",
+        "git tag",
+        "tag release",
+        "mark version",
+        "tag commit"
+      ],
+      "command": "git tag v{version}",
+      "description_noob": "I'll mark this point in your project history with a version label.",
+      "description_learner": "git tag creates a lightweight tag. git tag -a v1.0 -m 'message' for annotated tag. git push --tags to push.",
+      "description_pro": "git tag v{version}",
+      "example": "git tag v1.0.0",
+      "safety": "green",
+      "reversible": true,
+      "undo": "git tag -d v{version}",
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "python_version",
+      "triggers": [
+        "python version",
+        "which python",
+        "python3 version",
+        "check python"
+      ],
+      "command": "python3 --version",
+      "description_noob": "I'll show which version of Python is installed.",
+      "description_learner": "python3 --version shows the version. python3 -c 'import sys; print(sys.version)' for more detail.",
+      "description_pro": "python3 --version",
+      "example": "python3 --version",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "create_requirements",
+      "triggers": [
+        "create requirements file",
+        "generate requirements",
+        "save dependencies",
+        "freeze packages"
+      ],
+      "command": "pip freeze > requirements.txt",
+      "description_noob": "I'll save a list of all your Python packages so others can install them.",
+      "description_learner": "pip freeze outputs installed packages in requirements format. Redirect to requirements.txt to save.",
+      "description_pro": "pip freeze > requirements.txt",
+      "example": "pip freeze > requirements.txt",
+      "safety": "green",
+      "reversible": true,
+      "undo": "rm requirements.txt",
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_flask",
+      "triggers": [
+        "run flask",
+        "start flask",
+        "flask app",
+        "python flask server"
+      ],
+      "command": "python3 -m flask run --host=0.0.0.0",
+      "description_noob": "I'll start your Flask web server so you can access it from your phone's browser.",
+      "description_learner": "flask run starts dev server. --host=0.0.0.0 makes it accessible on local network. Default port 5000.",
+      "description_pro": "python3 -m flask run --host=0.0.0.0",
+      "example": "python3 -m flask run --host=0.0.0.0",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "python3"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_calendar",
+      "triggers": [
+        "show calendar",
+        "calendar",
+        "what day",
+        "monthly calendar",
+        "cal"
+      ],
+      "command": "cal",
+      "description_noob": "I'll show this month's calendar.",
+      "description_learner": "cal shows current month. cal 2025 shows full year. cal 12 2025 shows specific month.",
+      "description_pro": "cal",
+      "example": "cal",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_uptime",
+      "triggers": [
+        "uptime",
+        "how long running",
+        "device uptime",
+        "system uptime"
+      ],
+      "command": "uptime",
+      "description_noob": "I'll show how long your device has been running since the last restart.",
+      "description_learner": "uptime shows time since boot, logged in users, and load averages (1, 5, 15 minute).",
+      "description_pro": "uptime",
+      "example": "uptime",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "generate_random_password",
+      "triggers": [
+        "generate password",
+        "random password",
+        "strong password",
+        "create password"
+      ],
+      "command": "openssl rand -base64 24",
+      "description_noob": "I'll generate a random strong password for you.",
+      "description_learner": "openssl rand -base64 N generates N random bytes encoded as base64. Good for passwords and tokens.",
+      "description_pro": "openssl rand -base64 24",
+      "example": "openssl rand -base64 24",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "openssl"
+      ],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "check_file_hash",
+      "triggers": [
+        "file hash",
+        "md5 file",
+        "sha256 file",
+        "checksum file",
+        "verify file"
+      ],
+      "command": "sha256sum {filename}",
+      "description_noob": "I'll calculate a unique fingerprint for that file to verify it hasn't been corrupted.",
+      "description_learner": "sha256sum generates a SHA-256 hash. Compare with published hash to verify download integrity. md5sum for MD5.",
+      "description_pro": "sha256sum {filename}",
+      "example": "sha256sum downloaded.zip",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "monitor_network",
+      "triggers": [
+        "network usage",
+        "bandwidth monitor",
+        "network speed",
+        "data usage"
+      ],
+      "command": "pkg install nethogs -y && nethogs",
+      "description_noob": "I'll install and open a network monitor to show which apps are using your data.",
+      "description_learner": "nethogs shows per-process network usage in real time. Needs installation. q to quit.",
+      "description_pro": "pkg install nethogs -y && nethogs",
+      "example": "nethogs",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "network",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_open_files",
+      "triggers": [
+        "open files",
+        "lsof",
+        "what files open",
+        "list open files",
+        "file handles"
+      ],
+      "command": "lsof | head -30",
+      "description_noob": "I'll show which files are currently open by running programs.",
+      "description_learner": "lsof lists open files. lsof -i shows network connections. lsof -p PID shows files for specific process.",
+      "description_pro": "lsof | head -30",
+      "example": "lsof | head -30",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "setup_git_full",
+      "triggers": [
+        "setup git completely",
+        "configure git",
+        "git first time setup",
+        "git full setup"
+      ],
+      "command": "git config --global user.name \"{name}\" && git config --global user.email \"{email}\" && git config --global init.defaultBranch main",
+      "description_noob": "I'll configure Git with your name, email, and set the default branch to 'main'. Fill in your details.",
+      "description_learner": "Sets user.name, user.email, and defaultBranch globally. Required before first commit. Use your GitHub email.",
+      "description_pro": "git config --global user.name/email/init.defaultBranch",
+      "example": "git config --global user.name 'DeVen' && git config --global user.email 'me@email.com'",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "git"
+      ],
+      "category": "git",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_ruby",
+      "triggers": [
+        "install ruby",
+        "get ruby",
+        "ruby programming",
+        "ruby gems"
+      ],
+      "command": "pkg install ruby -y",
+      "description_noob": "I'll install Ruby \u2014 a programming language often used for web development.",
+      "description_learner": "Termux package is 'ruby'. Includes gem package manager. gem install bundler after.",
+      "description_pro": "pkg install ruby -y",
+      "example": "pkg install ruby -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall ruby",
+      "requires": [],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_golang",
+      "triggers": [
+        "install go",
+        "install golang",
+        "go programming",
+        "golang"
+      ],
+      "command": "pkg install golang -y",
+      "description_noob": "I'll install Go \u2014 a fast, modern programming language made by Google.",
+      "description_learner": "Termux package is 'golang'. Sets up GOPATH automatically. go run, go build, go install.",
+      "description_pro": "pkg install golang -y",
+      "example": "pkg install golang -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall golang",
+      "requires": [],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_rust",
+      "triggers": [
+        "install rust",
+        "install rustc",
+        "cargo",
+        "rust programming"
+      ],
+      "command": "pkg install rust -y",
+      "description_noob": "I'll install Rust \u2014 a powerful systems programming language. Warning: this is a large download (~500MB).",
+      "description_learner": "pkg install rust gives rustc compiler and cargo package manager. Large install. Use on mid/high tier devices.",
+      "description_pro": "pkg install rust -y",
+      "example": "pkg install rust -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall rust",
+      "requires": [],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_java",
+      "triggers": [
+        "install java",
+        "install jdk",
+        "java programming",
+        "javac",
+        "openjdk"
+      ],
+      "command": "pkg install openjdk-21 -y",
+      "description_noob": "I'll install Java \u2014 needed for Android development and many Java programs.",
+      "description_learner": "Termux has OpenJDK 21. Includes javac, java, jar. Use openjdk-17 for smaller footprint.",
+      "description_pro": "pkg install openjdk-21 -y",
+      "example": "pkg install openjdk-21 -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall openjdk-21",
+      "requires": [],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_php",
+      "triggers": [
+        "install php",
+        "php programming",
+        "php server"
+      ],
+      "command": "pkg install php -y",
+      "description_noob": "I'll install PHP \u2014 a popular language for building websites.",
+      "description_learner": "PHP for Termux. Run scripts: php script.php. Built-in server: php -S 0.0.0.0:8080.",
+      "description_pro": "pkg install php -y",
+      "example": "pkg install php -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall php",
+      "requires": [],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_php_server",
+      "triggers": [
+        "php server",
+        "start php",
+        "php built in server",
+        "php development server"
+      ],
+      "command": "php -S 0.0.0.0:8080",
+      "description_noob": "I'll start PHP's built-in web server. Open your browser to http://localhost:8080.",
+      "description_learner": "php -S starts the built-in dev server. 0.0.0.0 makes it accessible on local network. Ctrl+C to stop.",
+      "description_pro": "php -S 0.0.0.0:8080",
+      "example": "php -S 0.0.0.0:8080",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "php"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "run_node_script",
+      "triggers": [
+        "run node script",
+        "execute javascript",
+        "node script",
+        "run js file"
+      ],
+      "command": "node {script}.js",
+      "description_noob": "I'll run your JavaScript file with Node.js.",
+      "description_learner": "node executes a JS file. node with no args opens interactive REPL. --inspect for debugger.",
+      "description_pro": "node {script}.js",
+      "example": "node server.js",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [
+        "nodejs"
+      ],
+      "category": "programming",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_mariadb",
+      "triggers": [
+        "install mysql",
+        "install mariadb",
+        "database server",
+        "mysql server"
+      ],
+      "command": "pkg install mariadb -y",
+      "description_noob": "I'll install MariaDB \u2014 a database server (the Termux version of MySQL).",
+      "description_learner": "Termux uses MariaDB instead of MySQL. After install: mysql_install_db, then mysqld_safe & to start.",
+      "description_pro": "pkg install mariadb -y",
+      "example": "pkg install mariadb -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall mariadb",
+      "requires": [],
+      "category": "database",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_redis",
+      "triggers": [
+        "install redis",
+        "redis server",
+        "redis cache"
+      ],
+      "command": "pkg install redis -y",
+      "description_noob": "I'll install Redis \u2014 a fast in-memory data storage system.",
+      "description_learner": "pkg install redis. Start: redis-server. Connect: redis-cli. Default port 6379.",
+      "description_pro": "pkg install redis -y",
+      "example": "pkg install redis -y",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall redis",
+      "requires": [],
+      "category": "database",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "backup_termux",
+      "triggers": [
+        "backup termux",
+        "backup home",
+        "export termux",
+        "save termux setup"
+      ],
+      "command": "tar -czf /sdcard/Download/termux_backup_$(date +%Y%m%d).tar.gz -C /data/data/com.termux/files ./home ./usr",
+      "description_noob": "I'll create a complete backup of your Termux setup and save it to your Downloads folder.",
+      "description_learner": "Archives the Termux home and usr directories. Date-stamped filename. Restore: tar -xzf backup.tar.gz -C /data/data/com.termux/files/",
+      "description_pro": "tar -czf /sdcard/Download/termux_backup_$(date +%Y%m%d).tar.gz -C /data/data/com.termux/files ./home ./usr",
+      "example": "see command",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "install_figlet",
+      "triggers": [
+        "install figlet",
+        "ascii art text",
+        "big text terminal",
+        "figlet",
+        "banner text"
+      ],
+      "command": "pkg install figlet -y",
+      "description_noob": "I'll install figlet \u2014 it turns text into big ASCII art letters in the terminal.",
+      "description_learner": "figlet renders text as ASCII art. figlet 'Hello' or pipe: echo 'Hello' | figlet. -f font to change style.",
+      "description_pro": "pkg install figlet -y",
+      "example": "pkg install figlet -y && figlet VERNUX",
+      "safety": "green",
+      "reversible": true,
+      "undo": "pkg uninstall figlet",
+      "requires": [],
+      "category": "terminal",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "change_repo_mirror",
+      "triggers": [
+        "change repo mirror",
+        "slow packages",
+        "fix slow download",
+        "termux mirror",
+        "change repository"
+      ],
+      "command": "termux-change-repo",
+      "description_noob": "I'll open a menu to pick a faster package download server near you.",
+      "description_learner": "termux-change-repo lets you select a mirror. Pick one geographically close for faster pkg installs.",
+      "description_pro": "termux-change-repo",
+      "example": "termux-change-repo",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "packages",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "show_process_tree",
+      "triggers": [
+        "process tree",
+        "pstree",
+        "parent child processes",
+        "show process hierarchy"
+      ],
+      "command": "ps aux --forest",
+      "description_noob": "I'll show all running processes in a tree format showing which started which.",
+      "description_learner": "ps aux --forest shows process hierarchy. Parent-child relationships visible. pstree (pkg install pstree) is cleaner.",
+      "description_pro": "ps aux --forest",
+      "example": "ps aux --forest",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "processes",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "monitor_file_changes",
+      "triggers": [
+        "watch file changes",
+        "monitor directory",
+        "inotify",
+        "watch folder changes"
+      ],
+      "command": "watch -n 2 ls -la",
+      "description_noob": "I'll watch this folder and refresh every 2 seconds to show any new or changed files.",
+      "description_learner": "watch -n N runs a command every N seconds. Ctrl+C to stop. Good for monitoring build output or log dirs.",
+      "description_pro": "watch -n 2 ls -la",
+      "example": "watch -n 2 ls -la",
+      "safety": "green",
+      "reversible": true,
+      "undo": null,
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "encode_base64",
+      "triggers": [
+        "base64 encode",
+        "encode base64",
+        "convert base64",
+        "b64 encode"
+      ],
+      "command": "echo '{text}' | base64",
+      "description_noob": "I'll encode that text to Base64 format.",
+      "description_learner": "base64 encodes to Base64. base64 -d decodes. Pipe: echo 'text' | base64 or base64 file.",
+      "description_pro": "echo '{text}' | base64",
+      "example": "echo 'hello world' | base64",
+      "safety": "green",
+      "reversible": true,
+      "undo": "echo '{encoded}' | base64 -d",
+      "requires": [],
+      "category": "system",
+      "source_credit": "vernux"
+    },
+    {
+      "id": "create_symlink",
+      "triggers": [
+        "create symlink",
+        "make link",
+        "symbolic link",
+        "shortcut to folder",
+        "ln symlink"
+      ],
+      "command": "ln -s {target} {link_name}",
+      "description_noob": "I'll create a shortcut that points to another file or folder.",
+      "description_learner": "ln -s creates a symbolic link. The link_name points to target. Useful for aliasing long paths.",
+      "description_pro": "ln -s {target} {link_name}",
+      "example": "ln -s /sdcard/Download ~/dl",
+      "safety": "yellow",
+      "reversible": true,
+      "undo": "rm {link_name}",
+      "requires": [],
+      "category": "files",
+      "source_credit": "vernux"
+    }
+  ],
+  "_note": "Built by tools/build_db.py + Phase 1 additions"
+}

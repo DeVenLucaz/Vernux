@@ -1,0 +1,769 @@
+{
+  "_comment": "VERNUX Built-in Recipes — Phase 3",
+  "_version": "0.4.0",
+  "recipes": [
+    {
+      "id": "push_project_to_github",
+      "triggers": [
+        "push project to github", "push to github", "upload project github",
+        "deploy to github", "push my project", "connect project to github",
+        "github push wizard", "setup github repo"
+      ],
+      "title": "Push Project to GitHub",
+      "description": "Full wizard — git init, configure identity, SSH key setup, connect remote, commit, push.",
+      "estimated_minutes": 5,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "check_git",
+          "title": "Check git is installed",
+          "command": "git --version",
+          "description_noob": "First let me check git is installed on your device.",
+          "description_learner": "Verifying git installation before proceeding.",
+          "description_pro": "git --version",
+          "safety": "green",
+          "prereq_check": "git",
+          "prereq_install": "pkg install git -y",
+          "on_fail": "I'll install git first."
+        },
+        {
+          "id": "check_git_config",
+          "title": "Check git identity",
+          "command": "git config --global user.name",
+          "description_noob": "Checking if git knows your name — it needs this before saving your work.",
+          "description_learner": "Verifying git user.name and user.email are configured.",
+          "description_pro": "git config check",
+          "safety": "green",
+          "conditional": true,
+          "if_empty_run": "git_config_setup"
+        },
+        {
+          "id": "git_config_setup",
+          "title": "Configure git identity",
+          "command": "git config --global user.name \"{name}\" && git config --global user.email \"{email}\" && git config --global init.defaultBranch main",
+          "description_noob": "I need your name and email for git. Use the same email as your GitHub account.",
+          "description_learner": "Setting user.name, user.email, and default branch to main.",
+          "description_pro": "git config --global user.name/email/init.defaultBranch",
+          "safety": "green",
+          "params_needed": ["name", "email"],
+          "param_prompts": {
+            "name":  "Your name (for git commits): ",
+            "email": "Your GitHub email: "
+          }
+        },
+        {
+          "id": "check_git_init",
+          "title": "Initialize git repo",
+          "command": "test -d .git && echo 'already_init' || git init",
+          "description_noob": "Setting up this folder as a Git project.",
+          "description_learner": "Running git init if .git/ doesn't exist yet.",
+          "description_pro": "git init (if needed)",
+          "safety": "green"
+        },
+        {
+          "id": "git_add_all",
+          "title": "Stage all files",
+          "command": "git add .",
+          "description_noob": "Marking all your files to be saved.",
+          "description_learner": "Staging all changes with git add .",
+          "description_pro": "git add .",
+          "safety": "green"
+        },
+        {
+          "id": "git_commit",
+          "title": "Create first commit",
+          "command": "git commit -m \"{message}\" || git commit --allow-empty -m \"{message}\"",
+          "description_noob": "Saving a snapshot of your project.",
+          "description_learner": "Creating the initial commit. --allow-empty handles empty repos.",
+          "description_pro": "git commit -m '{message}'",
+          "safety": "green",
+          "params_needed": ["message"],
+          "param_prompts": {
+            "message": "Commit message (e.g. 'initial commit'): "
+          },
+          "param_defaults": {"message": "initial commit"}
+        },
+        {
+          "id": "check_ssh_key",
+          "title": "Check SSH key",
+          "command": "test -f ~/.ssh/id_ed25519.pub && echo 'key_exists' || echo 'no_key'",
+          "description_noob": "Checking if you have an SSH key set up for GitHub.",
+          "description_learner": "Checking for ~/.ssh/id_ed25519.pub",
+          "description_pro": "SSH key check",
+          "safety": "green",
+          "conditional": true,
+          "if_output_contains": "no_key",
+          "then_run": "ssh_keygen_step"
+        },
+        {
+          "id": "ssh_keygen_step",
+          "title": "Generate SSH key",
+          "command": "ssh-keygen -t ed25519 -C \"{email}\" -f ~/.ssh/id_ed25519 -N ''",
+          "description_noob": "Creating a secure key so GitHub can identify you without a password.",
+          "description_learner": "Generating ed25519 SSH key pair. -N '' = no passphrase for automation.",
+          "description_pro": "ssh-keygen -t ed25519 -N ''",
+          "safety": "yellow",
+          "params_needed": ["email"],
+          "param_prompts": {"email": "Your GitHub email (for SSH key): "}
+        },
+        {
+          "id": "show_ssh_key",
+          "title": "Show your SSH public key",
+          "command": "cat ~/.ssh/id_ed25519.pub",
+          "description_noob": "Here is your SSH key. You need to add this to GitHub before continuing.\n\n  Steps:\n  1. Copy the key that appears below\n  2. Go to github.com → Settings → SSH and GPG keys → New SSH key\n  3. Paste it and save\n  4. Come back here and press Enter to continue",
+          "description_learner": "Copy this public key and add it to GitHub Settings → SSH Keys.",
+          "description_pro": "cat ~/.ssh/id_ed25519.pub — add to GitHub",
+          "safety": "green",
+          "pause_after": true,
+          "pause_message": "Press Enter after you've added the SSH key to GitHub: "
+        },
+        {
+          "id": "set_remote",
+          "title": "Connect to GitHub",
+          "command": "git remote remove origin 2>/dev/null; git remote add origin git@github.com:{github_username}/{repo_name}.git",
+          "description_noob": "Connecting your project to GitHub. I need your GitHub username and repo name.",
+          "description_learner": "Setting the remote origin to your GitHub repo via SSH.",
+          "description_pro": "git remote add origin git@github.com:user/repo.git",
+          "safety": "green",
+          "params_needed": ["github_username", "repo_name"],
+          "param_prompts": {
+            "github_username": "Your GitHub username: ",
+            "repo_name":       "Repository name on GitHub: "
+          }
+        },
+        {
+          "id": "rename_branch",
+          "title": "Set branch to main",
+          "command": "git branch -M main",
+          "description_noob": "Setting the branch name to 'main' — the GitHub standard.",
+          "description_learner": "Renaming branch to main (GitHub default).",
+          "description_pro": "git branch -M main",
+          "safety": "green"
+        },
+        {
+          "id": "git_push",
+          "title": "Push to GitHub",
+          "command": "git push -u origin main",
+          "description_noob": "Uploading your project to GitHub now!",
+          "description_learner": "Pushing with -u to set upstream tracking. After this, just git push works.",
+          "description_pro": "git push -u origin main",
+          "safety": "yellow",
+          "long_task": true
+        }
+      ]
+    },
+
+    {
+      "id": "setup_python_dev",
+      "triggers": [
+        "setup python dev environment", "python development setup",
+        "setup python project", "new python project", "python dev setup",
+        "python environment setup"
+      ],
+      "title": "Setup Python Dev Environment",
+      "description": "Install Python, pip, create a virtual environment, and set up a project structure.",
+      "estimated_minutes": 3,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "install_python",
+          "title": "Install Python 3",
+          "command": "pkg install python3 -y",
+          "description_noob": "Installing Python 3 — the programming language you'll be using.",
+          "description_learner": "Installing python3 via pkg. Includes pip automatically.",
+          "description_pro": "pkg install python3 -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "upgrade_pip",
+          "title": "Upgrade pip",
+          "command": "pip install --upgrade pip",
+          "description_noob": "Updating Python's package installer to the latest version.",
+          "description_learner": "Upgrading pip to latest. Avoids version warnings on install.",
+          "description_pro": "pip install --upgrade pip",
+          "safety": "green"
+        },
+        {
+          "id": "make_project_dir",
+          "title": "Create project folder",
+          "command": "mkdir -p {project_name} && cd {project_name}",
+          "description_noob": "Creating a folder for your project.",
+          "description_learner": "Creating project directory.",
+          "description_pro": "mkdir -p {project_name}",
+          "safety": "green",
+          "params_needed": ["project_name"],
+          "param_prompts": {"project_name": "Project name: "},
+          "param_defaults": {"project_name": "myproject"}
+        },
+        {
+          "id": "create_venv",
+          "title": "Create virtual environment",
+          "command": "cd {project_name} && python3 -m venv venv",
+          "description_noob": "Creating a private Python environment just for this project.",
+          "description_learner": "python3 -m venv creates isolated environment. Activate with source venv/bin/activate.",
+          "description_pro": "python3 -m venv venv",
+          "safety": "green"
+        },
+        {
+          "id": "create_main_py",
+          "title": "Create main.py",
+          "command": "echo '# {project_name}\\nprint(\"Hello from {project_name}!\")' > {project_name}/main.py",
+          "description_noob": "Creating a starter Python file for your project.",
+          "description_learner": "Creating main.py entry point.",
+          "description_pro": "touch main.py",
+          "safety": "green"
+        },
+        {
+          "id": "create_requirements",
+          "title": "Create requirements.txt",
+          "command": "touch {project_name}/requirements.txt",
+          "description_noob": "Creating a requirements file — this will list all the Python packages your project needs.",
+          "description_learner": "Creating empty requirements.txt. Add packages with pip install X then pip freeze > requirements.txt.",
+          "description_pro": "touch requirements.txt",
+          "safety": "green"
+        },
+        {
+          "id": "show_activate",
+          "title": "Show how to activate",
+          "command": "echo 'Virtual environment created!'",
+          "description_noob": "Your Python project is ready!\n\n  To start working:\n  $ cd {project_name}\n  $ source venv/bin/activate\n  $ python3 main.py",
+          "description_learner": "Setup complete. cd {project_name} && source venv/bin/activate to start.",
+          "description_pro": "Done. cd {project_name} && source venv/bin/activate.",
+          "safety": "green"
+        }
+      ]
+    },
+
+    {
+      "id": "download_youtube_video",
+      "triggers": [
+        "download youtube video", "youtube download", "download video",
+        "get youtube video", "save video from youtube", "yt-dlp setup"
+      ],
+      "title": "Download YouTube Video",
+      "description": "Install yt-dlp and ffmpeg, then download a video to your Downloads folder.",
+      "estimated_minutes": 5,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "install_ytdlp",
+          "title": "Install yt-dlp",
+          "command": "pkg install yt-dlp -y",
+          "description_noob": "Installing yt-dlp — the tool that downloads videos.",
+          "description_learner": "yt-dlp is the maintained fork of youtube-dl. Supports 1000+ sites.",
+          "description_pro": "pkg install yt-dlp -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "install_ffmpeg",
+          "title": "Install ffmpeg",
+          "command": "pkg install ffmpeg -y",
+          "description_noob": "Installing ffmpeg — needed to convert and process the video files.",
+          "description_learner": "ffmpeg is required by yt-dlp for audio/video merging and conversion.",
+          "description_pro": "pkg install ffmpeg -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "setup_storage",
+          "title": "Check storage access",
+          "command": "test -d ~/storage/downloads && echo 'ok' || echo 'needs_setup'",
+          "description_noob": "Checking if Termux can save to your Downloads folder.",
+          "description_learner": "Verifying ~/storage/downloads symlink exists.",
+          "description_pro": "storage check",
+          "safety": "green",
+          "conditional": true,
+          "if_output_contains": "needs_setup",
+          "then_run": "setup_storage_step"
+        },
+        {
+          "id": "setup_storage_step",
+          "title": "Setup storage access",
+          "command": "termux-setup-storage",
+          "description_noob": "Giving Termux permission to save to your Downloads folder. A popup will appear — tap Allow.",
+          "description_learner": "termux-setup-storage creates ~/storage symlinks. Accept the permission popup.",
+          "description_pro": "termux-setup-storage",
+          "safety": "green",
+          "pause_after": true,
+          "pause_message": "Press Enter after tapping Allow on the popup: "
+        },
+        {
+          "id": "get_url",
+          "title": "Get video URL",
+          "command": "echo '{url}'",
+          "description_noob": "What's the YouTube URL you want to download?",
+          "description_learner": "Enter the video URL.",
+          "description_pro": "URL input",
+          "safety": "green",
+          "params_needed": ["url"],
+          "param_prompts": {"url": "YouTube URL: "}
+        },
+        {
+          "id": "download_video",
+          "title": "Download video",
+          "command": "yt-dlp -o '~/storage/downloads/%(title)s.%(ext)s' {url}",
+          "description_noob": "Downloading now — this may take a few minutes depending on your connection. The video will appear in your Downloads folder.",
+          "description_learner": "Downloading to ~/storage/downloads/ with title as filename.",
+          "description_pro": "yt-dlp -o ~/storage/downloads/%(title)s.%(ext)s {url}",
+          "safety": "green",
+          "long_task": true
+        }
+      ]
+    },
+
+    {
+      "id": "make_termux_look_good",
+      "triggers": [
+        "make termux look good", "beautify termux", "setup zsh termux",
+        "oh my zsh termux", "nice terminal", "customize termux",
+        "termux theme setup", "zsh setup"
+      ],
+      "title": "Make Termux Look Good",
+      "description": "Install zsh, Oh My Zsh, and a clean theme for a much better terminal experience.",
+      "estimated_minutes": 5,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "install_zsh",
+          "title": "Install zsh",
+          "command": "pkg install zsh curl git -y",
+          "description_noob": "Installing zsh — a much better shell than the default one.",
+          "description_learner": "Installing zsh, curl, and git (all required for Oh My Zsh).",
+          "description_pro": "pkg install zsh curl git -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "install_omz",
+          "title": "Install Oh My Zsh",
+          "command": "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" --unattended",
+          "description_noob": "Installing Oh My Zsh — this gives you a beautiful, colorful terminal.",
+          "description_learner": "--unattended installs without prompts. Sets zsh as default shell automatically.",
+          "description_pro": "OMZ unattended install",
+          "safety": "yellow",
+          "long_task": true
+        },
+        {
+          "id": "set_theme",
+          "title": "Set theme to agnoster",
+          "command": "sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"agnoster\"/' ~/.zshrc",
+          "description_noob": "Setting the 'agnoster' theme — a clean, informative look.",
+          "description_learner": "Replacing default robbyrussell theme with agnoster in ~/.zshrc.",
+          "description_pro": "sed -i ZSH_THEME ~/.zshrc",
+          "safety": "yellow"
+        },
+        {
+          "id": "add_aliases",
+          "title": "Add useful aliases",
+          "command": "echo '\\nalias ll=\"ls -la\"\\nalias gs=\"git status\"\\nalias gp=\"git push\"\\nalias gl=\"git log --oneline -10\"' >> ~/.zshrc",
+          "description_noob": "Adding shortcuts: 'll' for list files, 'gs' for git status, 'gp' for git push.",
+          "description_learner": "Adding ll, gs, gp, gl aliases to ~/.zshrc.",
+          "description_pro": "aliases → ~/.zshrc",
+          "safety": "green"
+        },
+        {
+          "id": "switch_to_zsh",
+          "title": "Switch to zsh",
+          "command": "chsh -s zsh",
+          "description_noob": "Making zsh your default shell. Restart Termux to see the new look!",
+          "description_learner": "Setting zsh as default shell. Takes effect on next Termux session.",
+          "description_pro": "chsh -s zsh",
+          "safety": "yellow",
+          "pause_after": true,
+          "pause_message": "Press Enter, then restart Termux to see your new shell: "
+        }
+      ]
+    },
+
+    {
+      "id": "setup_local_web_server",
+      "triggers": [
+        "set up local web server", "local web server", "serve files locally",
+        "start web server", "setup nginx", "python web server setup",
+        "http server setup"
+      ],
+      "title": "Set Up Local Web Server",
+      "description": "Start a local web server to serve files on your network.",
+      "estimated_minutes": 2,
+      "requires_internet": false,
+      "steps": [
+        {
+          "id": "check_python",
+          "title": "Check Python installed",
+          "command": "python3 --version",
+          "description_noob": "Checking if Python is installed — we'll use it to run the server.",
+          "description_learner": "Verifying python3 is available.",
+          "description_pro": "python3 check",
+          "safety": "green",
+          "prereq_check": "python3",
+          "prereq_install": "pkg install python3 -y"
+        },
+        {
+          "id": "check_storage",
+          "title": "Check storage access",
+          "command": "test -d ~/storage && echo 'ok' || termux-setup-storage",
+          "description_noob": "Making sure Termux can access your files.",
+          "description_learner": "Checking storage permission.",
+          "description_pro": "storage check",
+          "safety": "green"
+        },
+        {
+          "id": "get_port",
+          "title": "Choose port",
+          "command": "echo 'Using port {port}'",
+          "description_noob": "Which port should the server use? Press Enter for the default (8080).",
+          "description_learner": "Port for the HTTP server. 8080 is safe. 80 requires root.",
+          "description_pro": "port selection",
+          "safety": "green",
+          "params_needed": ["port"],
+          "param_prompts": {"port": "Port number (default 8080): "},
+          "param_defaults": {"port": "8080"}
+        },
+        {
+          "id": "get_ip",
+          "title": "Get your IP address",
+          "command": "ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -1",
+          "description_noob": "Finding your phone's IP address so you can open the server in a browser.",
+          "description_learner": "Showing local IP address for LAN access.",
+          "description_pro": "ip addr show",
+          "safety": "green"
+        },
+        {
+          "id": "start_server",
+          "title": "Start the server",
+          "command": "python3 -m http.server {port} --bind 0.0.0.0",
+          "description_noob": "Server is starting! Open your browser and go to: http://YOUR_IP:{port}\n  Press Ctrl+C when you want to stop the server.",
+          "description_learner": "python3 -m http.server serves current directory. --bind 0.0.0.0 allows LAN access.",
+          "description_pro": "python3 -m http.server {port} --bind 0.0.0.0",
+          "safety": "green",
+          "long_task": true
+        }
+      ]
+    },
+
+    {
+      "id": "backup_termux",
+      "triggers": [
+        "backup termux", "backup termux to sdcard", "save termux backup",
+        "export termux", "termux backup", "backup my setup"
+      ],
+      "title": "Backup Termux to SD Card",
+      "description": "Create a complete backup of your Termux home and packages to your Downloads folder.",
+      "estimated_minutes": 3,
+      "requires_internet": false,
+      "steps": [
+        {
+          "id": "check_storage",
+          "title": "Check storage access",
+          "command": "test -d /sdcard/Download && echo 'ok' || echo 'needs_setup'",
+          "description_noob": "Checking if Termux can write to your Downloads folder.",
+          "description_learner": "Verifying /sdcard/Download is accessible.",
+          "description_pro": "storage check",
+          "safety": "green",
+          "conditional": true,
+          "if_output_contains": "needs_setup",
+          "then_run": "fix_storage"
+        },
+        {
+          "id": "fix_storage",
+          "title": "Setup storage access",
+          "command": "termux-setup-storage",
+          "description_noob": "Setting up storage access first. Tap Allow on the popup.",
+          "description_learner": "termux-setup-storage needed before backup.",
+          "description_pro": "termux-setup-storage",
+          "safety": "green",
+          "pause_after": true,
+          "pause_message": "Press Enter after allowing storage access: "
+        },
+        {
+          "id": "check_space",
+          "title": "Check available space",
+          "command": "df -h /sdcard | tail -1",
+          "description_noob": "Checking if your SD card has enough space for the backup.",
+          "description_learner": "Checking /sdcard free space before backup.",
+          "description_pro": "df -h /sdcard",
+          "safety": "green"
+        },
+        {
+          "id": "create_backup",
+          "title": "Create backup archive",
+          "command": "tar -czf /sdcard/Download/termux_backup_$(date +%Y%m%d_%H%M).tar.gz -C /data/data/com.termux/files ./home ./usr 2>/dev/null && echo 'Backup complete!'",
+          "description_noob": "Creating your backup now. This includes all your files and installed packages. May take a minute.",
+          "description_learner": "Archiving Termux home and usr directories. Date-stamped filename.",
+          "description_pro": "tar -czf /sdcard/Download/termux_backup_$(date).tar.gz ./home ./usr",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "show_result",
+          "title": "Show backup location",
+          "command": "ls -lh /sdcard/Download/termux_backup_*.tar.gz | tail -1",
+          "description_noob": "Your backup is saved in your Downloads folder. You can find it in the Files app.",
+          "description_learner": "Showing the created backup file size and location.",
+          "description_pro": "ls -lh backup",
+          "safety": "green"
+        }
+      ]
+    },
+
+    {
+      "id": "setup_nodejs_project",
+      "triggers": [
+        "setup nodejs project", "new nodejs project", "create node project",
+        "nodejs setup", "new node app", "setup node.js project"
+      ],
+      "title": "Setup Node.js Project",
+      "description": "Install Node.js, initialize a project, install Express, and create a starter server.",
+      "estimated_minutes": 4,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "install_node",
+          "title": "Install Node.js",
+          "command": "pkg install nodejs -y",
+          "description_noob": "Installing Node.js — the JavaScript runtime for your server.",
+          "description_learner": "Installing nodejs via pkg. Includes npm automatically.",
+          "description_pro": "pkg install nodejs -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "make_dir",
+          "title": "Create project folder",
+          "command": "mkdir -p {project_name} && cd {project_name}",
+          "description_noob": "Creating your project folder.",
+          "description_learner": "Creating project directory.",
+          "description_pro": "mkdir -p {project_name}",
+          "safety": "green",
+          "params_needed": ["project_name"],
+          "param_prompts": {"project_name": "Project name: "},
+          "param_defaults": {"project_name": "mynodeapp"}
+        },
+        {
+          "id": "npm_init",
+          "title": "Initialize npm project",
+          "command": "cd {project_name} && npm init -y",
+          "description_noob": "Setting up your Node.js project — creates a package.json file.",
+          "description_learner": "npm init -y creates package.json with defaults.",
+          "description_pro": "npm init -y",
+          "safety": "green"
+        },
+        {
+          "id": "install_express",
+          "title": "Install Express",
+          "command": "cd {project_name} && npm install express",
+          "description_noob": "Installing Express — the most popular web framework for Node.js.",
+          "description_learner": "npm install express adds Express to node_modules and package.json.",
+          "description_pro": "npm install express",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "create_server",
+          "title": "Create starter server",
+          "command": "cat > {project_name}/index.js << 'EOF'\nconst express = require('express');\nconst app = express();\nconst PORT = 3000;\n\napp.get('/', (req, res) => {\n  res.send('Hello from {project_name}!');\n});\n\napp.listen(PORT, '0.0.0.0', () => {\n  console.log(`Server running on http://localhost:${PORT}`);\n});\nEOF",
+          "description_noob": "Creating a starter Express server file.",
+          "description_learner": "Creating index.js with basic Express server on port 3000.",
+          "description_pro": "create index.js",
+          "safety": "green"
+        },
+        {
+          "id": "show_start",
+          "title": "How to start",
+          "command": "echo 'Project ready!'",
+          "description_noob": "Your Node.js project is ready!\n\n  To start the server:\n  $ cd {project_name}\n  $ node index.js\n\n  Then open: http://localhost:3000",
+          "description_learner": "Run: cd {project_name} && node index.js. Open http://localhost:3000.",
+          "description_pro": "cd {project_name} && node index.js",
+          "safety": "green"
+        }
+      ]
+    },
+
+    {
+      "id": "compress_and_share",
+      "triggers": [
+        "compress and share folder", "zip and share", "compress folder share",
+        "send folder as zip", "zip folder and share", "archive and share"
+      ],
+      "title": "Compress and Share Folder",
+      "description": "Zip a folder and share it via Android share sheet.",
+      "estimated_minutes": 2,
+      "requires_internet": false,
+      "steps": [
+        {
+          "id": "check_zip",
+          "title": "Check zip installed",
+          "command": "command -v zip",
+          "description_noob": "Checking zip is available.",
+          "description_learner": "Verifying zip command.",
+          "description_pro": "which zip",
+          "safety": "green",
+          "prereq_check": "zip",
+          "prereq_install": "pkg install zip -y"
+        },
+        {
+          "id": "get_folder",
+          "title": "Choose folder to compress",
+          "command": "ls -la",
+          "description_noob": "Here are the files in your current folder. Which one do you want to compress?",
+          "description_learner": "Showing current directory contents.",
+          "description_pro": "ls",
+          "safety": "green",
+          "params_needed": ["folder_name"],
+          "param_prompts": {"folder_name": "Folder/file to compress: "}
+        },
+        {
+          "id": "compress",
+          "title": "Create zip archive",
+          "command": "zip -r {folder_name}.zip {folder_name}/",
+          "description_noob": "Compressing your folder into a zip file.",
+          "description_learner": "zip -r creates a recursive archive of the folder.",
+          "description_pro": "zip -r {folder_name}.zip {folder_name}/",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "show_size",
+          "title": "Show archive size",
+          "command": "du -sh {folder_name}.zip",
+          "description_noob": "Here's your compressed file and its size.",
+          "description_learner": "Showing compressed archive size.",
+          "description_pro": "du -sh",
+          "safety": "green"
+        },
+        {
+          "id": "share",
+          "title": "Share the file",
+          "command": "termux-share {folder_name}.zip",
+          "description_noob": "Opening the share menu so you can send it to WhatsApp, Drive, email, etc.",
+          "description_learner": "termux-share opens Android intent chooser. Needs termux-api.",
+          "description_pro": "termux-share {folder_name}.zip",
+          "safety": "green",
+          "optional": true,
+          "optional_message": "Share the zip now? (requires termux-api)"
+        }
+      ]
+    },
+
+    {
+      "id": "fix_storage_access",
+      "triggers": [
+        "fix termux storage access", "fix storage", "sdcard not working",
+        "cant access sdcard", "storage permission fix", "termux storage broken",
+        "fix sdcard termux"
+      ],
+      "title": "Fix Termux Storage Access",
+      "description": "Diagnose and fix all common Termux storage permission issues.",
+      "estimated_minutes": 2,
+      "requires_internet": false,
+      "steps": [
+        {
+          "id": "check_current",
+          "title": "Check current storage state",
+          "command": "test -d ~/storage && echo 'symlinks_exist' || echo 'no_symlinks'",
+          "description_noob": "Checking what storage access you currently have.",
+          "description_learner": "Checking ~/storage symlinks exist.",
+          "description_pro": "test -d ~/storage",
+          "safety": "green"
+        },
+        {
+          "id": "run_setup",
+          "title": "Run storage setup",
+          "command": "termux-setup-storage",
+          "description_noob": "Running the storage setup. A popup will appear — tap Allow.\n\n  If you've done this before but storage still doesn't work, tap Allow again — it resets the permission.",
+          "description_learner": "termux-setup-storage requests permission and creates ~/storage symlinks.",
+          "description_pro": "termux-setup-storage",
+          "safety": "green",
+          "pause_after": true,
+          "pause_message": "Press Enter after tapping Allow on the popup: "
+        },
+        {
+          "id": "verify",
+          "title": "Verify storage works",
+          "command": "ls ~/storage/downloads && echo 'Storage access: WORKING'",
+          "description_noob": "Checking if storage access is working now.",
+          "description_learner": "Verifying ~/storage/downloads is accessible.",
+          "description_pro": "ls ~/storage/downloads",
+          "safety": "green"
+        },
+        {
+          "id": "test_write",
+          "title": "Test write access",
+          "command": "echo 'vernux_test' > ~/storage/downloads/.vernux_test && rm ~/storage/downloads/.vernux_test && echo 'Write test: PASSED'",
+          "description_noob": "Testing that you can actually save files to your Downloads folder.",
+          "description_learner": "Write test: create and delete a test file in Downloads.",
+          "description_pro": "write test",
+          "safety": "green"
+        }
+      ]
+    },
+
+    {
+      "id": "update_everything",
+      "triggers": [
+        "update everything", "update all", "full update", "upgrade everything",
+        "update termux fully", "update all packages"
+      ],
+      "title": "Update Everything",
+      "description": "Update Termux packages, Python packages, and npm global packages.",
+      "estimated_minutes": 5,
+      "requires_internet": true,
+      "steps": [
+        {
+          "id": "pkg_update",
+          "title": "Update package list",
+          "command": "pkg update -y",
+          "description_noob": "Refreshing the list of available packages.",
+          "description_learner": "pkg update fetches latest package index from Termux repos.",
+          "description_pro": "pkg update -y",
+          "safety": "green",
+          "long_task": true
+        },
+        {
+          "id": "pkg_upgrade",
+          "title": "Upgrade all packages",
+          "command": "pkg upgrade -y",
+          "description_noob": "Installing newer versions of all your tools. This may take a few minutes.",
+          "description_learner": "pkg upgrade installs newer versions of all installed packages.",
+          "description_pro": "pkg upgrade -y",
+          "safety": "yellow",
+          "long_task": true
+        },
+        {
+          "id": "pip_upgrade",
+          "title": "Upgrade Python packages",
+          "command": "pip list --outdated --format=columns 2>/dev/null | tail -n +3 | awk '{print $1}' | xargs -r pip install --upgrade 2>/dev/null || echo 'No Python packages to update'",
+          "description_noob": "Updating all your Python packages.",
+          "description_learner": "Upgrading all outdated pip packages.",
+          "description_pro": "pip upgrade all outdated",
+          "safety": "yellow",
+          "long_task": true,
+          "optional": true,
+          "optional_message": "Update Python packages too?"
+        },
+        {
+          "id": "npm_upgrade",
+          "title": "Upgrade npm global packages",
+          "command": "npm update -g 2>/dev/null || echo 'No global npm packages'",
+          "description_noob": "Updating global Node.js tools.",
+          "description_learner": "npm update -g upgrades all globally installed npm packages.",
+          "description_pro": "npm update -g",
+          "safety": "green",
+          "optional": true,
+          "optional_message": "Update npm global packages too?"
+        },
+        {
+          "id": "cleanup",
+          "title": "Clean up old files",
+          "command": "pkg autoclean && echo 'Cleanup done'",
+          "description_noob": "Removing old downloaded package files to free up space.",
+          "description_learner": "pkg autoclean removes cached .deb files.",
+          "description_pro": "pkg autoclean",
+          "safety": "green"
+        }
+      ]
+    }
+  ]
+}

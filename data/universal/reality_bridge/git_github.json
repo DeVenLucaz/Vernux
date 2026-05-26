@@ -1,0 +1,23 @@
+{
+  "ssh_vs_https": {
+    "triggers": ["ssh vs https github", "which protocol github", "https or ssh", "git protocol"],
+    "category": "git",
+    "noob": "There are two ways to connect to GitHub:\n\n  HTTPS (easier to start):\n  $ git clone https://github.com/user/repo.git\n  Asks for username + token when pushing\n\n  SSH (better long-term):\n  $ git clone git@github.com:user/repo.git\n  Never asks for password once set up\n\n  For beginners: use HTTPS first, switch to SSH later.",
+    "learner": "HTTPS: use token in URL or prompt. SSH: one-time key setup then password-free forever.\n  Set up SSH:\n  $ ssh-keygen -t ed25519 -C 'email'\n  $ cat ~/.ssh/id_ed25519.pub  # add to GitHub Settings",
+    "pro": "HTTPS with PAT in remote URL or SSH key. ed25519 preferred over RSA."
+  },
+  "git_push_rejected": {
+    "triggers": ["push rejected", "git push failed", "non-fast-forward", "push error", "rejected updates"],
+    "category": "git",
+    "noob": "GitHub is rejecting your push because the online version has changes you haven't downloaded yet.\n\n  Fix:\n  1. Pull the latest changes first:\n  $ git pull\n\n  2. If there are conflicts, resolve them, then:\n  $ git add .\n  $ git commit -m 'merge'\n  $ git push",
+    "learner": "Non-fast-forward: remote has commits you don't have locally.\n  $ git pull --rebase  # cleaner than merge\n  Or: $ git pull && git push\n  Force push only if you know what you're doing: git push --force-with-lease",
+    "pro": "git pull --rebase then push. Or git push --force-with-lease if sure."
+  },
+  "detached_head": {
+    "triggers": ["detached head", "git detached", "not on branch", "head detached"],
+    "category": "git",
+    "noob": "You're in a 'detached HEAD' state — you're viewing an old version of your project, not the current branch.\n\n  To get back to normal:\n  $ git checkout main\n  (or 'master' if that's your main branch)",
+    "learner": "Detached HEAD means HEAD points to a commit, not a branch.\n  Return to branch: git checkout main\n  Save work from detached HEAD: git checkout -b new-branch-name",
+    "pro": "git checkout main. To save: git checkout -b branch-name from detached state."
+  }
+}
