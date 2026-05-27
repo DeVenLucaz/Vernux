@@ -4,9 +4,9 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Termux-green.svg)]()
-[![Version](https://img.shields.io/badge/Version-v0.7.3-orange.svg)]()
+[![Version](https://img.shields.io/badge/Version-v0.7.5-orange.svg)]()
 [![Patterns](https://img.shields.io/badge/Patterns-151%2B-brightgreen.svg)]()
-[![Library](https://img.shields.io/badge/Library-500%2B%20commands-blue.svg)]()
+[![Library](https://img.shields.io/badge/Library-700%2B%20commands-blue.svg)]()
 [![Recipes](https://img.shields.io/badge/Recipes-10-brightgreen.svg)]()
 [![Free Forever](https://img.shields.io/badge/Free-Forever-brightgreen.svg)]()
 
@@ -122,11 +122,22 @@ VERNUX 🟡 > library categories
 
 When you type something VERNUX doesn't recognise as a task, it automatically checks the library for matching commands and shows you what it knows — before giving up or asking the AI.
 
-After install, build the library once (requires internet):
+After install, build the full offline library once (requires internet):
 
 ```bash
-python tools/fetch_library.py          # full build (~500 commands)
-python tools/fetch_library.py --quick  # quick build (60 priority commands)
+# Step 1 — fetch Linux Command Library data (~500 commands)
+python tools/fetch_library.py
+
+# Step 2 — fetch tldr-pages data and merge (~200+ additional commands)
+python tools/build_library_tldr.py
+
+# Combined result: 700+ commands in data/library.json, fully offline after this
+```
+
+Quick build (faster, fewer commands):
+```bash
+python tools/fetch_library.py --quick
+python tools/build_library_tldr.py --quick
 ```
 
 ---
@@ -286,11 +297,14 @@ VERNUX's offline knowledge base is built from the following open-source projects
 - **What we use:** English descriptions from `all.nl` paired with bash commands from `all.cm`. Filtered to Termux-relevant commands, cleaned, and converted to trigger phrases by `tools/build_patterns_db.py`
 
 ### tldr-pages
-> Community cheatsheets used to generate trigger phrases and learner descriptions in `data/patterns.json`
+> Community cheatsheets used to generate trigger phrases and to expand the offline command library in `data/library.json`
 
 - **Source:** [tldr-pages/tldr](https://github.com/tldr-pages/tldr) — community-maintained
 - **License:** [Creative Commons CC0 1.0 Universal](https://github.com/tldr-pages/tldr/blob/main/LICENSE.md) (public domain dedication)
-- **What we use:** Example descriptions from `pages/android/`, `pages/linux/`, and `pages/common/` — converted to trigger phrases and learner descriptions by `tools/build_patterns_db.py`
+- **What we use:**
+  - Example descriptions from `pages/android/`, `pages/linux/`, and `pages/common/` — converted to trigger phrases and learner descriptions by `tools/build_patterns_db.py`
+  - Command descriptions and examples from all three platforms — converted to VERNUX's offline library format by `tools/build_library_tldr.py`, filling gaps not covered by LinuxCommandLibrary. tldr entries add 200+ additional commands including git subcommands, termux-specific tools, and modern CLI utilities.
+- **Contributors:** [tldr-pages contributors](https://github.com/tldr-pages/tldr/graphs/contributors)
 
 ---
 
