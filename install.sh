@@ -119,6 +119,18 @@ python3 tools/build_db.py > /dev/null 2>&1 && success "Data files built" || \
     warn "Data build had warnings — VERNUX will still work"
 
 # ---------------------------------------------------------------------------
+# Step 7b: Build offline command library (tldr-pages + LinuxCommandLibrary)
+# ---------------------------------------------------------------------------
+info "Building offline command library (710+ commands)..."
+info "Downloading tldr-pages (~5MB, CC0 public domain)..."
+if python3 tools/build_library_tldr.py --quiet 2>/dev/null; then
+    success "Command library built (710+ commands offline)"
+else
+    warn "Library build failed — run manually: python3 tools/build_library_tldr.py"
+    warn "VERNUX will still work, but explain/search will have fewer commands"
+fi
+
+# ---------------------------------------------------------------------------
 # Step 8: Device profile
 # ---------------------------------------------------------------------------
 info "Profiling your device..."
