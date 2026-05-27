@@ -27,6 +27,33 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.7.4] — Phase 6 — AI Fallback Fix — 2026-05-27
+
+### Fixed
+
+- **llama.cpp banner leak** — Old llama.cpp builds (`b0-unknown`) ignore `--log-disable` and dump the full startup banner, available commands menu, and echoed system prompt to **stdout** instead of stderr, causing all of that noise to appear in the terminal and corrupt the AI output. Fixed with two layers:
+  1. Added `--simple-io` and `-e` flags to the llama-cli invocation — these suppress interactive UI on older builds.
+  2. Added `_strip_banner()` helper in `modules/interpreter.py` — strips everything before the actual AI response using the prompt tail as an anchor, with a heuristic line-scanner fallback for builds that mangle the output differently.
+- **AI fallback ignoring question/explanation queries** — The system prompt told the AI to output only bash commands. When users asked questions like `"what is json"` or `"explain grep"`, `validate_output()` correctly rejected the natural language answer as not a command, so the fallback silently returned nothing. Fixed by adding intent detection before the AI is called.
+
+### Added
+
+- **`_is_question()`** — intent classifier in `vernux.py` that detects explanation/question queries using a regex pattern covering `what is`, `how does`, `explain`, `why is`, `difference between`, `how do i`, and similar phrasings.
+- **`_extract_topic()`** — strips question prefixes from user input to extract the core topic word(s), used for follow-up hints.
+- **`_llm_explain_flow()`** — new function that routes question queries to `llm_query_explain()` instead of `llm_query()`, with full mode-aware output:
+  - **Noob** — plain English answer + `"Want to learn more? Try: explain <topic>"` hint
+  - **Learner** — full explanation + related command surfaced from offline library with breakdown hint
+  - **Pro** — first paragraph only + `→ explain <command>` shortcut, no hand-holding
+- **`try_llm_fallback()` reworked** — now routes through intent detection first. Question → `_llm_explain_flow()`. Action → bash command flow (unchanged). If action query returns no command, falls back to explain flow as last resort.
+- **Pro mode AI action output** — pro mode now shows `$ command` directly without the `🤖 AI generated:` label.
+
+### Changed
+
+- `modules/interpreter.py` — `query()` and `query_explain()` both now call `_strip_banner()` on raw stdout before processing.
+- `modules/__init__.py` — version bumped to `0.7.4`.
+
+---
+
 ## [v0.7.3] — Phase 6 — Pattern Builder — 2026-05-27
 
 ### Added
