@@ -27,6 +27,32 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.7.5] — Phase 6 — Database Expansion — 2026-05-28
+
+### Added
+
+- **`tools/build_library_tldr.py`** — new build tool that downloads the tldr-pages zip (~5MB, CC0 public domain), parses `pages/android/`, `pages/linux/`, and `pages/common/` platforms, and converts them into VERNUX's offline library format. Key features:
+  - Mode-aware output generation — noob gets description + first example walkthrough, learner gets description + up to 3 annotated examples, pro gets one-line summary
+  - Smart merge — by default, existing LCL entries win (richer data), tldr fills gaps only. `--overwrite` flag available for reverse priority
+  - `--quick` mode for android + common only (faster for low-storage devices)
+  - `--cmd <name>` for testing a single command parse
+  - Placeholder cleanup — converts `{{arg}}` syntax to readable `<arg>`
+  - Category auto-detection using the same category map as the rest of VERNUX
+  - Full meta block written to library.json tracking entry counts per source
+
+- **700+ command offline library** — running both `tools/fetch_library.py` and `tools/build_library_tldr.py` now produces a combined `data/library.json` covering 700+ commands. tldr-pages adds ~200 entries not covered by LinuxCommandLibrary, including all major git subcommands (`git-clone`, `git-checkout`, `git-stash`, etc.), termux-specific tools, and modern CLI utilities (`fzf`, `bat`, `ripgrep`, `fd`, `httpie`).
+
+### Changed
+
+- **README.md** — updated tools section with two-step library build instructions, updated library badge to 700+, expanded tldr-pages credits section to document the new `build_library_tldr.py` tool and what it contributes.
+- **`modules/__init__.py`** — version bumped to `0.7.5`.
+
+### Why this matters
+
+Before this, VERNUX's AI fallback was the only way to answer `what is a monorepo` or `explain git stash`. Now the offline library handles hundreds more queries without touching the model at all — faster, works without a downloaded model, and gives mode-aware answers with real examples.
+
+---
+
 ## [v0.7.4] — Phase 6 — AI Fallback Fix — 2026-05-27
 
 ### Fixed
