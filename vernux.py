@@ -782,6 +782,7 @@ def handle_update(mode: str):
     pkg      = results.get("pkg_cache", {})
     patterns = results.get("patterns", {})
     recipes  = results.get("recipes", {})
+    library  = results.get("library", {})
 
     # Version / code
     if ver_info.get("available"):
@@ -793,7 +794,7 @@ def handle_update(mode: str):
         print(f"  {ui.GREEN}✔{ui.RESET}  Already up to date (v{ver_info.get('current_version', '?')})")
 
     # Data files
-    for label, res in [("Package cache", pkg), ("Patterns", patterns), ("Recipes", recipes)]:
+    for label, res in [("Package cache", pkg), ("Patterns", patterns), ("Recipes", recipes), ("Command library", library)]:
         if res and res.get("ok"):
             print(f"  {ui.GREEN}✔{ui.RESET}  {label} refreshed")
         elif res:
