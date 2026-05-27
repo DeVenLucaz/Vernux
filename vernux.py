@@ -773,6 +773,39 @@ def print_recipes_list():
 # ---------------------------------------------------------------------------
 # CLI routing
 # ---------------------------------------------------------------------------
+def handle_update(mode: str):
+    print(f"\n  {ui.CYAN}🔄 Checking for updates...{ui.RESET}\n")
+    results = run_full_update(verbose=True)
+
+    ver_info = results.get("version_check", {})
+    code     = results.get("code_update", {})
+    pkg      = results.get("pkg_cache", {})
+    patterns = results.get("patterns", {})
+    recipes  = results.get("recipes", {})
+
+    # Version / code
+    if ver_info.get("available"):
+        if code.get("ok"):
+            print(f"  {ui.GREEN}✔{ui.RESET}  Code updated → v{ver_info.get('latest_version', '?')}")
+        else:
+            print(f"  {ui.YELLOW}⚠{ui.RESET}  Code update failed: {code.get('message', 'unknown error')}")
+    else:
+        print(f"  {ui.GREEN}✔{ui.RESET}  Already up to date (v{ver_info.get('current_version', '?')})")
+
+    # Data files
+    for label, res in [("Package cache", pkg), ("Patterns", patterns), ("Recipes", recipes)]:
+        if res and res.get("ok"):
+            print(f"  {ui.GREEN}✔{ui.RESET}  {label} refreshed")
+        elif res:
+            print(f"  {ui.YELLOW}⚠{ui.RESET}  {label}: {res.get('message', 'skipped')}")
+
+    print()
+    if mode == "noob":
+        print(f"  {ui.GRAY}VERNUX is ready to use.{ui.RESET}\n")
+    else:
+        print(f"  {ui.GRAY}Update complete.{ui.RESET}\n")
+
+
 def handle_cli_args(args: list) -> bool:
     if not args:
         return False
