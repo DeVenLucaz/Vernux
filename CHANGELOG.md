@@ -27,6 +27,32 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.7.3] — Phase 6 — Pattern Builder — 2026-05-27
+
+### Added
+- **`tools/build_patterns_db.py`** — new dev tool that automatically builds and expands `data/patterns.json` from two open-source datasets:
+  1. **NL2Bash (MIT)** — ~9,000 natural language ↔ bash command pairs sourced from StackOverflow. Converts them into Vernux's pattern format.
+  2. **tldr-pages (CC0)** — community cheatsheet pages (one per command), downloaded as a zip and parsed into patterns.
+  - Output: `data/patterns_generated.json` (new patterns only) and an updated `data/patterns.json` (merged, no duplicates).
+  - Flags: `--nl2bash`, `--tldr`, `--dry-run` (stats only), `--limit N` (cap new patterns).
+  - Generated patterns carry `source_credit` tags (`nl2bash` / `tldr`) and use `description_learner` only — noob descriptions require human review.
+- **`tools/review_patterns.py`** — new dev tool to audit generated patterns after running `build_patterns_db.py`.
+  - Walks through patterns that are missing `description_noob` and prompts for human-written ones.
+  - Flags: `--source nl2bash|tldr` (filter by source), `--stats` (coverage overview), `--auto-noob` (auto-generate basic noob descriptions from learner descriptions using a verb-mapping table).
+- **`tools/fetch_library.py`** — moved from v0.7.0 into the `tools/` directory (previously only referenced in docs, now properly tracked as a dev tool).
+
+### Changed
+- `tools/` directory is now the canonical home for all data-pipeline dev tools (`build_db.py`, `build_patterns_db.py`, `fetch_library.py`, `review_patterns.py`).
+- `modules/explainer.py` — minor updates to support pattern source attribution.
+- `vernux.py` — minor updates in sync with explainer changes.
+- `CHANGELOG.md` — updated with this entry.
+
+### Notes
+- `data/patterns_generated.json` is not included in the repo by default — it is produced locally by running `build_patterns_db.py`.
+- Generated patterns are merged into `data/patterns.json` only after review with `review_patterns.py --auto-noob` or manual editing.
+
+---
+
 ## [v0.7.2] — Phase 6 — Library Auto-suggest — 2026-05-27
 
 ### Added
@@ -117,8 +143,6 @@ VERNUX > search for text in files
 - **AI answer silently dropped for explain queries** — `what is JSON`, `what is grep`, and similar explanation queries were running through `validate_output()` which only accepts bash commands matching `VALID_CMD_STARTS`. The model's plain-text answer was always rejected, falling through to "I don't have offline documentation". Fixed by adding a separate `query_explain()` function in `interpreter.py` with its own `EXPLAIN_SYSTEM_PROMPT` (asks for plain English, 3-5 lines) and a dedicated display path in `handle_explain()` that prints the raw AI response directly without command validation.
 
 ---
-
-
 
 ### Fixed
 - **`explain` phrase queries ignored AI** — `explain what a zombie process is` and similar natural language explain queries were hitting the offline dict (failing), then showing "I don't have offline documentation" without ever trying the LLM. Now falls back to LLM automatically when offline dict has no result.
