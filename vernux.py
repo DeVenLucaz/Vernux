@@ -171,26 +171,71 @@ def check_package_before_install(user_input: str, mode: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# Intent detection — question vs action
+# ---------------------------------------------------------------------------
+
+_QUESTION_PATTERNS = re.compile(
+    r"^(what\s+is|what\s+are|what\s+does|what'?s|"
+    r"how\s+does|how\s+do\s+i|how\s+to|"
+    r"explain|tell\s+me\s+about|describe|"
+    r"why\s+is|why\s+does|why\s+do|"
+    r"when\s+to\s+use|what\s+can\s+i\s+do\s+with|"
+    r"difference\s+between|compare|vs\b|"
+    r"is\s+\w+\s+(a|an|the)|can\s+i)\b",
+    re.IGNORECASE
+)
+
+def _is_question(user_input: str) -> bool:
+    """Returns True if input looks like an explanation/question query."""
+    return bool(_QUESTION_PATTERNS.match(user_input.strip()))
+
+
+def _extract_topic(user_input: str) -> str:
+    """Pull the core topic word(s) from a question for follow-up hints."""
+    # Strip common question prefixes
+    cleaned = re.sub(
+        r"^(what\s+is|what\s+are|what\s+does|what'?s|how\s+does|"
+        r"explain|tell\s+me\s+about|describe|why\s+is|why\s+does|"
+        r"how\s+do\s+i|how\s+to|when\s+to\s+use|is\s+a|can\s+i)\s+",
+        "", user_input.strip(), flags=re.IGNORECASE
+    ).strip()
+    # Return first 3 words max
+    return " ".join(cleaned.split()[:3])
+
+
+# ---------------------------------------------------------------------------
 # LLM fallback
 # ---------------------------------------------------------------------------
 def try_llm_fallback(user_input: str, mode: str) -> bool:
     if not llm_available():
         return False
+
+    session = get_session()
+    profile = load_profile()
+    brand   = profile.get("brand", "")
+
+    # --- Intent detection: question vs action ---
+    if _is_question(user_input):
+        return _llm_explain_flow(user_input, mode)
+
+    # --- Action flow: generate bash command ---
     command = None
     with ui.Spinner("Thinking (local AI)"):
         command = llm_query(user_input)
     if not command:
-        return False
-    session = get_session()
-    profile = load_profile()
-    brand   = profile.get("brand", "")
+        # Command query but AI returned nothing — try explain as last resort
+        return _llm_explain_flow(user_input, mode)
+
     print()
     if mode == "noob":
         print(f"  {ui.CYAN}🤖 The AI suggests:{ui.RESET}")
         print(f"  {command}")
-    else:
+    elif mode == "learner":
         print(f"  {ui.CYAN}🤖 AI generated:{ui.RESET}")
         print(f"  {ui.GRAY}$ {command}{ui.RESET}")
+    else:  # pro
+        print(f"  {ui.GRAY}$ {command}{ui.RESET}")
+
     safety = classify(command, session.to_safety_context())
     level  = safety["level"]
     if safety["hard_stop"]:
@@ -214,6 +259,63 @@ def try_llm_fallback(user_input: str, mode: str) -> bool:
                     command=command)
     if exec_result["exit_code"] == 0 and not exec_result["stdout"].strip():
         ui.print_success("Done.", mode)
+    return True
+
+
+def _llm_explain_flow(user_input: str, mode: str) -> bool:
+    """
+    Handle explanation/question queries via AI.
+    Mode-aware output:
+      noob    — plain English answer, then friendly 'learn more' prompt
+      learner — explanation + related command shown with breakdown hint
+      pro     — concise answer + command on one line, no hand-holding
+    Returns True if AI gave a useful answer, False otherwise.
+    """
+    answer = None
+    with ui.Spinner("Thinking (local AI)"):
+        answer = llm_query_explain(user_input)
+    if not answer:
+        return False
+
+    topic = _extract_topic(user_input)
+    print()
+
+    if mode == "noob":
+        print(f"  {ui.CYAN}🤖 Here's what that means:{ui.RESET}")
+        print()
+        for line in answer.splitlines():
+            if line.strip():
+                print(f"  {line.strip()}")
+        print()
+        print(f"  {ui.GREEN}Want to learn more?{ui.RESET}")
+        print(f"  {ui.GRAY}Try: explain {topic}   or   library {topic}{ui.RESET}")
+        print()
+
+    elif mode == "learner":
+        print(f"  {ui.CYAN}🤖 AI explains:{ui.RESET}")
+        print()
+        for line in answer.splitlines():
+            if line.strip():
+                print(f"  {line.strip()}")
+        print()
+        # Try to also surface a related command hint
+        results = search_commands(topic)
+        if results:
+            name, desc = results[0]
+            print(f"  {ui.GRAY}Related command: {ui.BOLD}{name}{ui.RESET}{ui.GRAY} — {desc[:55]}{ui.RESET}")
+            print(f"  {ui.GRAY}Try: explain {name}   or   library {name}{ui.RESET}")
+        print()
+
+    else:  # pro
+        # Compact: one paragraph, then command if found
+        first_para = answer.strip().splitlines()[0] if answer.strip() else answer.strip()
+        print(f"  {ui.GRAY}{first_para}{ui.RESET}")
+        results = search_commands(topic)
+        if results:
+            name, _ = results[0]
+            print(f"  {ui.GRAY}→ explain {name}{ui.RESET}")
+        print()
+
     return True
 
 # ---------------------------------------------------------------------------
