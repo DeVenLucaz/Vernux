@@ -232,14 +232,39 @@ def _strip_banner(raw: str, prompt: str) -> str:
         if after:
             return after
 
-    # Strategy 2: skip lines that look like banner/info (llama.cpp startup)
-    # Banner lines typically start with known patterns
-    BANNER_PREFIXES = (
-        "llama", "build", "model", "modalities", "available commands",
+    # Strategy 2: only strip if output clearly contains banner noise
+    # Check for definitive banner markers before doing any stripping
+    BANNER_MARKERS = (
+        "llama.cpp",
+        "available commands:",
+        "/exit or ctrl+c",
+        "/regen",
+        "ggml_",
+        "llm_load_",
+        "[ prompt:",
+        "[ generation:",
+        "system_info:",
+        "build  :",
+        "build:",
+        "modalities :",
+        "> <|im_start|>",
+        "> <s>",
+    )
+    raw_lower = raw.lower()
+    has_banner = any(m in raw_lower for m in BANNER_MARKERS)
+
+    if not has_banner:
+        # No banner noise — return raw output as-is
+        return raw.strip()
+
+    # Banner confirmed — strip lines until we find real content
+    # Only skip lines that are clearly part of the llama.cpp UI
+    SKIP_PREFIXES = (
+        "llama", "build  ", "build:", "modalities", "available commands",
         "/exit", "/regen", "/clear", "/read", "/glob",
-        "> <", "ggml", "load_tensors", "llm_load", "sampling", "generate",
-        "[ prompt", "[ generation", "system_info", "main:", "warning:",
-        "Log start", "cli", "version", "cpu", "metal", "cuda",
+        "> <|", "> <s", "ggml", "load_tensors", "llm_load",
+        "[ prompt", "[ generation", "system_info", "main:",
+        "log start",
     )
     lines = raw.splitlines()
     result_lines = []
@@ -248,15 +273,16 @@ def _strip_banner(raw: str, prompt: str) -> str:
         stripped = line.strip()
         if skip_mode:
             low = stripped.lower()
-            if any(low.startswith(p) for p in BANNER_PREFIXES):
+            if any(low.startswith(p) for p in SKIP_PREFIXES):
                 continue
             if not stripped:
                 continue
-            # First non-banner line — switch off skip mode
+            # First non-banner line — stop skipping
             skip_mode = False
         result_lines.append(line)
 
-    return "\n".join(result_lines).strip()
+    cleaned = "\n".join(result_lines).strip()
+    return cleaned if cleaned else raw.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -581,7 +607,7 @@ def download_model(model: dict, on_progress=None) -> bool:
         url
     ]
 
-    # Fallback: curl
+    # # Fallback: curl
     curl_cmd = [
         "curl",
         "-L",                      # follow redirects
