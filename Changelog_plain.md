@@ -4,6 +4,25 @@ This file explains every update in simple language, no coding knowledge needed.
 
 ---
 
+## v0.7.5 — Bigger Offline Brain — 28 May 2026
+
+### What's new
+- **VERNUX now knows 710+ commands offline.** A second community knowledge source called tldr-pages (public domain, maintained by thousands of contributors) was added. It fills in 200+ commands that weren't covered before — including all git sub-commands like `git stash`, `git rebase`, and `git cherry-pick`, plus modern tools like `fzf`, `bat`, `ripgrep`, and Termux-specific commands.
+- **The library builds itself automatically.** Before this, you had to run a command manually to download the library. Now it downloads and builds during install, and refreshes automatically every time you run `vernux update`. You don't have to do anything.
+- **`vernux update` now shows library status.** The update summary now includes a "Command library refreshed" line so you can see it's working.
+
+---
+
+## v0.7.4 — AI Fallback Fixed — 27 May 2026
+
+### What was fixed
+- **`vernux update` was crashing.** Running `vernux update` gave a "NameError: handle_update is not defined" error and quit immediately. The function existed on paper but was never actually written. Fixed — update now works and shows a proper summary of what was refreshed.
+- **The AI was printing its entire startup screen into your terminal.** When VERNUX fell back to the local AI, the AI model was printing its own interface — including a big "llama.cpp" banner, a list of commands like `/exit`, `/regen`, `/clear`, and the full system instructions — all directly into the VERNUX output. This was caused by the AI model being an older version that ignored the "stay quiet" flags. Fixed with a two-layer approach: better flags to suppress the UI, plus a smart text cleaner that strips any leftover startup noise before showing you the answer.
+- **The AI was ignoring questions like "what is JSON".** When you asked VERNUX something that starts with "what is", "how does", "explain", or similar, it was sending that to the AI with instructions to reply with a bash command only. So either the AI gave a useless command, or the answer got silently thrown away. Fixed — VERNUX now detects that you're asking a question and switches to explanation mode automatically.
+- **Answers are now mode-aware.** In Noob mode, you get a plain English answer followed by a "Want to learn more?" suggestion. In Learner mode, you get the explanation plus a related command shown with a breakdown hint. In Pro mode, you get one line and a shortcut — no hand-holding.
+
+---
+
 ## v0.7.3 — Pattern Builder — 27 May 2026
 
 ### What's new
