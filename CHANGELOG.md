@@ -31,6 +31,7 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ### Fixed
 
+- **`handle_update` NameError crash** — `vernux update` was crashing with `NameError: name 'handle_update' is not defined` because the function was called in `handle_cli_args()` and the main loop but never actually defined. Added `handle_update()` which runs `run_full_update()` and prints a clean mode-aware summary (noob gets friendly message, learner/pro get compact output).
 - **llama.cpp banner leak** — Old llama.cpp builds (`b0-unknown`) ignore `--log-disable` and dump the full startup banner, available commands menu, and echoed system prompt to **stdout** instead of stderr, causing all of that noise to appear in the terminal and corrupt the AI output. Fixed with two layers:
   1. Added `--simple-io` and `-e` flags to the llama-cli invocation — these suppress interactive UI on older builds.
   2. Added `_strip_banner()` helper in `modules/interpreter.py` — strips everything before the actual AI response using the prompt tail as an anchor, with a heuristic line-scanner fallback for builds that mangle the output differently.
@@ -38,6 +39,7 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ### Added
 
+- **`handle_update()`** — properly defined update handler in `vernux.py`. Calls `run_full_update()`, prints version status and data file refresh results. Mode-aware finish message.
 - **`_is_question()`** — intent classifier in `vernux.py` that detects explanation/question queries using a regex pattern covering `what is`, `how does`, `explain`, `why is`, `difference between`, `how do i`, and similar phrasings.
 - **`_extract_topic()`** — strips question prefixes from user input to extract the core topic word(s), used for follow-up hints.
 - **`_llm_explain_flow()`** — new function that routes question queries to `llm_query_explain()` instead of `llm_query()`, with full mode-aware output:
