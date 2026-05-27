@@ -27,6 +27,89 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.7.2] — Phase 6 — Library Auto-suggest — 2026-05-27
+
+### Added
+- **`library_auto_suggest()`** — new function in `vernux.py` that checks the offline library whenever pattern matching fails, before Vernux hits a dead end. It tries two strategies:
+  1. **Direct token match** — extracts command-like words from natural language input ("what is ripgrep" → checks `rg`/`ripgrep`) and shows a compact info card with synopsis, short description, and an example.
+  2. **Keyword search** — if no direct token hits, searches the library for the most relevant matches and shows up to 4 results with examples.
+- **`_extract_command_tokens()`** — helper that strips question/filler words from natural language to pull candidate command names.
+- **Smarter dead-end message** — when nothing is found anywhere, the "I don't know" message now includes a context-aware tip: `explain <command>` or `library search <term>` (if library is built), or `install-model` (if no AI).
+
+### Changed
+- **`process_match` fallback chain** is now 4 layers deep:
+  1. `try_llm_fallback` — LLM if model installed
+  2. `library_auto_suggest` — offline library (new, no model needed)
+  3. `ui.print_did_you_mean` — fuzzy pattern candidates
+  4. Dead-end message with contextual tip
+- Import line updated: `lookup` now imported as `lib_lookup` from `modules.explainer`.
+
+### Behaviour examples
+```
+VERNUX > what does ripgrep do
+  📚 Found in library:  ripgrep  [text]
+  rg [options] pattern [path]
+  ripgrep: fast recursive regex search, faster than grep.
+  Example: rg 'TODO' .
+  Full entry: library rg  |  Explain: explain rg
+
+VERNUX > search for text in files
+  📚 Library suggestions for 'search for text in files':
+  grep                  Search text. -r recursive, -i case insensitive...
+    eg: grep -rn 'TODO' .
+  rg                    ripgrep: fast recursive regex search...
+    eg: rg 'TODO' .
+  More: library search search text files
+```
+
+---
+
+## [v0.7.1] — Phase 6 — Library Polish — 2026-05-27
+
+### Added
+- **`library related <cmd>`** — new subcommand: shows all commands in the same category as the given command. Displayed as a 4-column grid.
+- **`library categories`** — new subcommand: lists every category with a count of how many commands it contains.
+- **`library search` / `library find`** — search results now show category tags inline and print two lines per result (name + description) for readability.
+- **`library <cmd>` rich card** — command lookups now append a `library related <cmd>` hint at the bottom (Noob/Learner modes) so users can naturally discover sibling commands.
+- **`library` (no args)** — status screen now shows a category preview line listing the first 8 categories.
+
+### Fixed
+- **`handle_explain` cascade bug** — `explain <cmd>` previously skipped the library layer on cache misses due to an incorrect string check. It now properly falls through: `COMMAND_DICT → library.json → close-match suggestions → LLM`.
+- **`explain <cmd>` close-match suggestions** — when a command isn't found in any offline source, Vernux now suggests similar commands from the library before saying "I don't know", instead of going straight to LLM.
+- **REPL library routing** — `library <cmd>` was stripping 8 chars instead of 7, causing `library grep` to look up `rep` instead of `grep`. Fixed.
+- **`explain` no-arg hint** — now shows library size in the usage hint so users know how many commands are available.
+
+### Changed
+- `handle_library` fully rewritten — cleaner separation of subcommands, consistent color usage, 4-column grid for category browsing, better not-found messages with suggestions.
+- `handle_explain` rewritten — cleaner 3-step cascade with explicit not-found markers list.
+- Help listing updated with all new `library` subcommands.
+
+---
+
+## [v0.7.0] — Phase 6 — Library Enrichment — 2026-05-27
+
+### Added
+- **`data/library.json`** — offline command reference database built from LinuxCommandLibrary.com (Apache 2.0, 500+ commands). Ships with Vernux, works 100% offline after install.
+- **`tools/fetch_library.py`** — dev tool to build/update `data/library.json`. Fetches command pages from linuxcommandlibrary.com, parses synopsis, description, and real examples, assigns Termux-relevant categories. Supports `--quick` (60 priority commands), `--merge` (keep existing entries), `--cmd` (single command debug), `--quiet`.
+- **`modules/explainer.py` — library layer** — `explain()` now checks a second lookup layer: `data/library.json`, after the curated `COMMAND_DICT` and before the LLM fallback. This means 500+ commands that weren't in the built-in dict now resolve offline with real man page data and examples.
+- **`vernux library` command** — new in-REPL and CLI command for direct library browsing:
+  - `library grep` — full entry for any command
+  - `library search <term>` — keyword search across all 500+ commands
+  - `library category <name>` — list commands by category
+  - `library categories` — list all available categories
+- **Library status in `help` and `stats`** — both screens now show how many commands are in the library, or a build hint if it hasn't been fetched yet.
+- **`list_categories()`** in `explainer.py` — returns all categories from both the curated dict and the library, used by the `library categories` command.
+
+### Changed
+- `explain()` no longer says "I don't have offline documentation" for commands covered by the library — it now shows the library entry with a `[Linux Command Library]` source tag (Learner mode only).
+- `search_commands()` now searches both `COMMAND_DICT` and `library.json`, returning up to 20 results combined.
+- `list_commands()` now returns commands from both layers.
+
+### Credits
+- Command reference data: [LinuxCommandLibrary](https://github.com/SimonSchubert/LinuxCommandLibrary) by Simon Schubert, Apache 2.0 license.
+
+---
+
 ## [v0.6.4] — Phase 5 — Hotfix 4 — 2026-05-27
 
 ### Fixed

@@ -18,7 +18,7 @@ from modules.safety         import classify, requires_confirmation, requires_exp
 from modules.executor       import run, resolve_new_cwd, fill_params
 from modules.mode           import get_mode, get_description, format_pre_run, format_result
 from modules.doctor         import run_all_checks, run_quick_checks
-from modules.explainer      import explain, search_commands
+from modules.explainer      import explain, search_commands, library_available, library_size, list_categories, lookup as lib_lookup
 from modules.packages       import resolve_name, get_install_advice, format_install_advice
 from modules.reality_bridge import explain_scenario
 from modules.context        import get_session
@@ -83,31 +83,54 @@ def first_run_setup():
 # Explain handler
 # ---------------------------------------------------------------------------
 def handle_explain(args_str: str, mode: str):
+    """
+    Explain a command or search the library.
+    Priority: COMMAND_DICT -> library.json -> close-match suggestions -> LLM
+    """
     cmd = args_str.strip()
     if not cmd:
-        print(f"\n  {ui.YELLOW}Usage: explain <command>{ui.RESET}\n")
+        lib_count = library_size()
+        hint = f" ({lib_count} commands available)" if lib_count else ""
+        print(f"\n  {ui.YELLOW}Usage: explain <command>{ui.RESET}{hint}\n")
         return
+
+    # Search mode — keyword search across dict + library
     if cmd.startswith("search "):
         query   = cmd[7:].strip()
         results = search_commands(query)
         if results:
-            print(f"\n  {ui.CYAN}Commands matching '{query}':{ui.RESET}")
-            for name, desc in results[:8]:
-                print(f"  {ui.BOLD}{name:<20}{ui.RESET} {ui.GRAY}{desc}{ui.RESET}")
+            print(f"\n  {ui.CYAN}Commands matching \'{query}\':{ui.RESET}")
+            for name, desc in results[:12]:
+                print(f"  {ui.BOLD}{name:<22}{ui.RESET} {ui.GRAY}{desc}{ui.RESET}")
             print()
         else:
-            print(f"\n  {ui.GRAY}No commands found for '{query}'{ui.RESET}\n")
+            print(f"\n  {ui.GRAY}No commands found for \'{query}\'.{ui.RESET}\n")
         return
 
-    # Try offline dictionary first (works for single known commands)
+    # Step 1: offline lookup (COMMAND_DICT + library.json)
     result = explain(cmd, mode)
-    if "I don't have offline documentation" not in result and "not found in offline" not in result:
+    not_found = (
+        "I don\'t have offline documentation" in result or
+        "not found in offline" in result or
+        "not have offline" in result
+    )
+
+    if not not_found:
         print()
         print(result)
         print()
         return
 
-    # Offline dict failed — try LLM explain query if available
+    # Step 2: library search for close matches on partial/misspelled input
+    close = search_commands(cmd)
+    if close:
+        print(f"\n  {ui.GRAY}No exact match for \'{cmd}\'. Similar commands:{ui.RESET}")
+        for name, desc in close[:5]:
+            print(f"  {ui.CYAN}▸{ui.RESET}  {ui.BOLD}{name:<22}{ui.RESET} {ui.GRAY}{desc[:60]}{ui.RESET}")
+        print(f"\n  {ui.GRAY}Try: explain {close[0][0]}{ui.RESET}\n")
+        return
+
+    # Step 3: LLM explain fallback
     if llm_available():
         print(f"\n  {ui.GRAY}Looking that up with AI...{ui.RESET}\n")
         with ui.Spinner("Thinking (local AI)"):
@@ -121,7 +144,7 @@ def handle_explain(args_str: str, mode: str):
             print()
             return
 
-    # Final fallback — show the offline message
+    # Final fallback — show the not-found message
     print()
     print(result)
     print()
@@ -192,6 +215,89 @@ def try_llm_fallback(user_input: str, mode: str) -> bool:
     if exec_result["exit_code"] == 0 and not exec_result["stdout"].strip():
         ui.print_success("Done.", mode)
     return True
+
+# ---------------------------------------------------------------------------
+# Library auto-suggest — called from process_match on unknown input
+# ---------------------------------------------------------------------------
+
+def _extract_command_tokens(user_input: str) -> list:
+    """
+    Pull candidate command tokens from natural language input.
+    e.g. "what does ripgrep do" → ["ripgrep"]
+         "how to use curl"      → ["curl"]
+         "compress files"       → ["compress", "files"]
+         "find large files"     → ["find", "large", "files"]
+    """
+    # Strip common question words and filler
+    stop = {
+        "what", "does", "how", "to", "use", "do", "is", "the",
+        "a", "an", "explain", "me", "i", "can", "want", "help",
+        "with", "my", "about", "for", "should", "would", "like",
+        "please", "could", "in", "of", "it", "this", "that",
+        "tell", "show", "give", "let", "know", "make",
+    }
+    words = re.findall(r'[a-z0-9_\-\.]+', user_input.lower())
+    return [w for w in words if w not in stop and len(w) > 1]
+
+
+def library_auto_suggest(user_input: str, mode: str) -> bool:
+    """
+    When pattern matching fails, check the library for:
+      1. Direct command name match (e.g. user typed "ripgrep" or "what is ripgrep")
+      2. Keyword search match on the input words
+
+    Returns True if we printed something useful (caller should return early).
+    Returns False if nothing found (caller continues to next fallback).
+    """
+    if not library_available():
+        return False
+
+    tokens = _extract_command_tokens(user_input)
+    if not tokens:
+        return False
+
+    # Step 1: try each token as a direct command name lookup
+    for token in tokens:
+        entry = lib_lookup(token)
+        if entry:
+            # Found a direct hit — print a compact "did you know" card
+            short   = entry.get("short", entry.get("noob", ""))[:140]
+            synopsis = entry.get("synopsis", token)
+            examples = entry.get("examples", [])
+            cat      = entry.get("category", "")
+
+            print(f"\n  {ui.CYAN}📚 Found in library:{ui.RESET}  {ui.BOLD}{token}{ui.RESET}"
+                  + (f"  {ui.GRAY}[{cat}]{ui.RESET}" if cat else ""))
+            print(f"  {ui.GRAY}{synopsis}{ui.RESET}")
+            if short:
+                print(f"\n  {short}")
+            if examples:
+                print(f"\n  {ui.GRAY}Example:{ui.RESET}  {examples[0]}")
+            print(f"\n  {ui.GRAY}Full entry: library {token}  |  Explain: explain {token}{ui.RESET}\n")
+            return True
+
+    # Step 2: keyword search on the raw input (max 2 words to keep it focused)
+    query   = " ".join(tokens[:3])
+    results = search_commands(query)
+    if results:
+        # Only show if at least one result looks relevant (name or desc contains a token)
+        relevant = [
+            (name, desc) for name, desc in results
+            if any(t in name or t in desc.lower() for t in tokens)
+        ]
+        if relevant:
+            print(f"\n  {ui.CYAN}📚 Library suggestions for '{user_input}':{ui.RESET}\n")
+            for name, desc in relevant[:4]:
+                entry   = lib_lookup(name)
+                ex      = entry.get("examples", [""])[0] if entry else ""
+                print(f"  {ui.BOLD}{name:<22}{ui.RESET}  {ui.GRAY}{desc[:55]}{ui.RESET}")
+                if ex:
+                    print(f"  {ui.GRAY}  eg: {ex}{ui.RESET}")
+            print(f"\n  {ui.GRAY}More: library search {query}{ui.RESET}\n")
+            return True
+
+    return False
+
 def process_match(user_input: str, mode: str) -> None:
     session = get_session()
     profile = load_profile()
@@ -204,12 +310,23 @@ def process_match(user_input: str, mode: str) -> None:
         print()
     result = match(user_input)
     if not result["found"]:
+        # Priority 1: LLM fallback (if model is installed)
         if try_llm_fallback(user_input, mode):
             return
+        # Priority 2: library auto-suggest (offline, no model needed)
+        if library_auto_suggest(user_input, mode):
+            return
+        # Priority 3: fuzzy pattern candidates ("did you mean?")
         if result["candidates"]:
             ui.print_did_you_mean(result["candidates"])
         else:
-            tip = "type 'install-model' to add AI" if not llm_available() else "try rephrasing"
+            # Dead end — show install-model tip or rephrase hint
+            if library_available():
+                tip = "try: explain <command>  or  library search <term>"
+            elif not llm_available():
+                tip = "type 'install-model' to add AI, or try: library search <term>"
+            else:
+                tip = "try rephrasing"
             ui.print_info(f"I don't know how to do that yet. {tip}.")
         return
     pattern = result["pattern"]
@@ -265,28 +382,143 @@ def process_match(user_input: str, mode: str) -> None:
 
 
 
+
 # ---------------------------------------------------------------------------
-def handle_update(mode: str):
-    print(f"\n  {ui.CYAN}{ui.BOLD}VERNUX Update{ui.RESET}\n")
-    print(f"  {ui.GRAY}Checking for updates...{ui.RESET}")
-    results = run_full_update()
-    ver = results["version_check"]
-    if ver.get("error"):
-        ui.print_error(f"Version check failed: {ver['error']}")
-    elif ver.get("available"):
-        ui.print_success(f"Updated to v{ver['latest_version']}", mode)
-    else:
-        ui.print_info(f"Code up to date (v{ver['current_version']})")
-    for key, label in [
-        ("pkg_cache", "Package cache"),
-        ("patterns",  "Patterns"),
-        ("recipes",   "Recipes"),
-    ]:
-        r = results.get(key, {})
-        if r.get("ok"):
-            ui.print_success(f"{label}: {r.get('message','updated')}", mode)
+# Library browser
+# ---------------------------------------------------------------------------
+
+def handle_library(args_str: str, mode: str):
+    """
+    Offline command library browser.
+
+    library                   — show library status + usage
+    library <command>         — full entry for a command
+    library search <term>     — keyword search
+    library category <name>   — list commands in a category
+    library categories        — list all categories
+    library related <command> — find commands in same category
+    """
+    from modules.explainer import (
+        lookup, list_categories, list_commands,
+        library_available, library_size, search_commands as lib_search,
+        explain as lib_explain,
+    )
+
+    args = args_str.strip()
+
+    # ── No args: status + usage ───────────────────────────────────────────
+    if not args or args in ("help", "?"):
+        lib_count = library_size()
+        if lib_count:
+            print(f"\n  {ui.CYAN}{ui.BOLD}📚 Command Library{ui.RESET}  {ui.GREEN}●{ui.RESET} {lib_count} commands, 100% offline")
         else:
-            ui.print_error(f"{label}: {r.get('message','failed')}")
+            print(f"\n  {ui.CYAN}{ui.BOLD}📚 Command Library{ui.RESET}  {ui.RED}●{ui.RESET} not built yet")
+            print(f"  {ui.GRAY}Build it: python tools/fetch_library.py{ui.RESET}\n")
+            return
+        cats = list_categories()
+        cat_preview = ", ".join(sorted(cats)[:8])
+        print(f"  {ui.GRAY}{len(cats)} categories: {cat_preview}...{ui.RESET}\n")
+        print(f"  {ui.BOLD}Usage:{ui.RESET}")
+        rows = [
+            ("library grep",           "full entry for any command"),
+            ("library search <term>",  "keyword search across all commands"),
+            ("library category files", "list commands in a category"),
+            ("library categories",     "list all categories"),
+            ("library related grep",   "find commands in the same category"),
+        ]
+        for cmd, desc in rows:
+            print(f"  {ui.CYAN}{cmd:<32}{ui.RESET} {ui.GRAY}{desc}{ui.RESET}")
+        print()
+        return
+
+    # ── categories ────────────────────────────────────────────────────────
+    if args in ("categories", "cats"):
+        cats = list_categories()
+        print(f"\n  {ui.CYAN}{ui.BOLD}Library Categories ({len(cats)}){ui.RESET}\n")
+        for cat in sorted(cats):
+            cmds = list_commands(category=cat)
+            print(f"  {ui.BOLD}{cat:<16}{ui.RESET}  {ui.GRAY}{len(cmds):3d} commands{ui.RESET}")
+        print()
+        return
+
+    # ── category <name> ───────────────────────────────────────────────────
+    if args.startswith(("category ", "cat ")):
+        cat  = args.split(" ", 1)[1].strip()
+        cmds = sorted(list_commands(category=cat))
+        if not cmds:
+            print(f"\n  {ui.GRAY}No commands found for category '{cat}'.{ui.RESET}")
+            cats = list_categories()
+            print(f"  Available: {', '.join(sorted(cats))}{ui.RESET}\n")
+            return
+        print(f"\n  {ui.CYAN}{ui.BOLD}{cat.upper()} — {len(cmds)} commands{ui.RESET}\n")
+        col_w = 20
+        cols  = 4
+        for i in range(0, len(cmds), cols):
+            row = cmds[i:i + cols]
+            print("  " + "".join(f"{c:<{col_w}}" for c in row))
+        print()
+        return
+
+    # ── search <term> ─────────────────────────────────────────────────────
+    if args.startswith(("search ", "find ")):
+        query   = args.split(" ", 1)[1].strip()
+        results = lib_search(query)
+        if not results:
+            print(f"\n  {ui.GRAY}No results for '{query}'.{ui.RESET}\n")
+            return
+        print(f"\n  {ui.CYAN}Results for '{query}'  ({len(results)} found){ui.RESET}\n")
+        for name, desc in results[:15]:
+            entry  = lookup(name)
+            cat    = entry.get("category", "") if entry else ""
+            cat_tag = f"  {ui.GRAY}[{cat}]{ui.RESET}" if cat else ""
+            print(f"  {ui.BOLD}{name:<22}{ui.RESET}{cat_tag}")
+            if desc:
+                print(f"  {ui.GRAY}  {desc[:72]}{ui.RESET}")
+        print()
+        return
+
+    # ── related <command> ─────────────────────────────────────────────────
+    if args.startswith(("related ", "rel ")):
+        cmd_name = args.split(" ", 1)[1].strip()
+        entry    = lookup(cmd_name)
+        if not entry:
+            print(f"\n  {ui.GRAY}'{cmd_name}' not found in library.{ui.RESET}\n")
+            return
+        cat = entry.get("category", "")
+        if not cat:
+            print(f"\n  {ui.GRAY}No category info for '{cmd_name}'.{ui.RESET}\n")
+            return
+        cmds = sorted(c for c in list_commands(category=cat) if c != cmd_name)
+        print(f"\n  {ui.CYAN}Related to '{cmd_name}'  (category: {cat}){ui.RESET}\n")
+        col_w = 20
+        cols  = 4
+        for i in range(0, len(cmds), cols):
+            row = cmds[i:i + cols]
+            print("  " + "".join(f"{c:<{col_w}}" for c in row))
+        print()
+        return
+
+    # ── default: look up a specific command ──────────────────────────────
+    entry = lookup(args)
+    if not entry:
+        close = lib_search(args)
+        if close:
+            print(f"\n  {ui.GRAY}'{args}' not found. Similar commands:{ui.RESET}")
+            for name, desc in close[:5]:
+                print(f"  {ui.CYAN}▸{ui.RESET}  {ui.BOLD}{name:<22}{ui.RESET} {ui.GRAY}{desc[:60]}{ui.RESET}")
+            print(f"\n  {ui.GRAY}Try: library {close[0][0]}{ui.RESET}\n")
+        else:
+            hint = "run: python tools/fetch_library.py" if not library_available() else "try: library search <term>"
+            print(f"\n  {ui.GRAY}'{args}' not found. ({hint}){ui.RESET}\n")
+        return
+
+    # Rich command card
+    result = lib_explain(args, mode)
+    cat    = entry.get("category", "")
+    if cat and mode != "pro":
+        result += f"\n\n  {ui.GRAY}Related: library related {args}{ui.RESET}"
+    print()
+    print(result)
     print()
 
 
@@ -320,6 +552,10 @@ def handle_stats(mode: str):
         print(f"  AI model       : {installed[0]['name']}")
     else:
         print(f"  AI model       : not installed")
+    if library_available():
+        print(f"  Command library: {library_size()} commands (Linux Command Library)")
+    else:
+        print(f"  Command library: not built  (run: python tools/fetch_library.py)")
     print()
 
 
@@ -388,6 +624,11 @@ def print_help(mode: str):
         print(f"  {ui.GREEN}🤖 Local AI: {model_name}{ui.RESET}")
     else:
         print(f"  {ui.GRAY}🤖 Local AI: not active — type 'install-model' to add it{ui.RESET}")
+    lib_count = library_size()
+    if lib_count:
+        print(f"  {ui.GREEN}📚 Library: {lib_count} commands (Linux Command Library){ui.RESET}")
+    else:
+        print(f"  {ui.GRAY}📚 Library: not built — run: python tools/fetch_library.py{ui.RESET}")
     print(f"  {ui.GRAY}{len(patterns)} patterns, {len(recipes)} recipes{ui.RESET}")
     print()
     print("  Say what you want to do:")
@@ -409,6 +650,10 @@ def print_help(mode: str):
         ("vernux config mode",   "noob / learner / pro"),
         ("vernux recipes",       "list all recipes"),
         ("install-model",        "add local AI model"),
+        ("vernux library <cmd>",       "look up any command offline"),
+        ("vernux library search <term>","keyword search across library"),
+        ("vernux library related <cmd>","find commands in same category"),
+        ("vernux library categories",  "list all categories"),
         ("vernux --version",     "show version"),
     ]:
         print(f"  {ui.CYAN}{cmd:<30}{ui.RESET} {ui.GRAY}{desc}{ui.RESET}")
@@ -479,6 +724,14 @@ def handle_cli_args(args: list) -> bool:
         print()
         return True
 
+    if cmd in ("library", "lib"):
+        # vernux library grep
+        # vernux library search compress
+        # vernux library category files
+        # vernux library related grep
+        handle_library(" ".join(args[1:]), config_get("mode", "learner"))
+        return True
+
     if cmd in ("--help", "-h"):
         print_help(config_get("mode", "noob"))
         return True
@@ -536,6 +789,15 @@ def repl(mode: str):
             continue
         if lower in ("recipes", "list recipes"):
             print_recipes_list()
+            continue
+        if lower.startswith("library") or lower.startswith("lib "):
+            # "library grep" → args_part="grep"
+            # "lib search tar" → args_part="search tar"
+            if lower.startswith("library"):
+                args_part = lower[7:].strip()
+            else:
+                args_part = lower[4:].strip()
+            handle_library(args_part, mode)
             continue
         if lower in ("install-model", "install model", "add ai", "download model"):
             handle_install_model(mode)

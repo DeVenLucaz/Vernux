@@ -1,14 +1,24 @@
 # =============================================================================
 # modules/explainer.py — Command Explainer & Offline Help
-# Version: 0.3.0 | Phase 2 — Knowledge Base
+# Version: 0.4.0 | Phase 1 — Library Enrichment
+# =============================================================================
+#
+# Lookup priority (all offline after first build):
+#   1. COMMAND_DICT  — curated Termux-aware entries with mode-aware depth
+#   2. LIBRARY       — data/library.json built from LinuxCommandLibrary.com
+#   3. LLM fallback  — interpreter.py (only if local model installed)
+#
+# The library layer adds ~500 commands that COMMAND_DICT doesn't cover,
+# with real examples and descriptions. Users never need to switch apps.
 # =============================================================================
 
 import re
 import os
+import json
 
 # ---------------------------------------------------------------------------
-# Built-in command dictionary
-# 120+ common commands with full mode-aware explanations
+# Built-in command dictionary — Termux-curated, mode-aware
+# 60+ commands with noob/learner/pro depth + Termux-specific context
 # ---------------------------------------------------------------------------
 
 COMMAND_DICT = {
@@ -133,7 +143,6 @@ COMMAND_DICT = {
         "pro":     "ln -s target link. ln (hard link). readlink -f to resolve.",
         "examples": ["ln -s /sdcard/Download ~/dl"],
     },
-
     # --- Archives ---
     "zip": {
         "synopsis": "zip [options] archive.zip files",
@@ -159,7 +168,6 @@ COMMAND_DICT = {
         "pro":     "tar -czf out.tar.gz dir/. tar -xzf file.tar.gz. tar -xzf file.tar.gz -C /dest/.",
         "examples": ["tar -czf backup.tar.gz myfolder/", "tar -xzf archive.tar.gz"],
     },
-
     # --- Network ---
     "curl": {
         "synopsis": "curl [options] url",
@@ -193,14 +201,13 @@ COMMAND_DICT = {
         "pro":     "ssh user@host. ssh -p 2222. ssh -i ~/.ssh/key. ssh -L 8080:localhost:80 user@host.",
         "examples": ["ssh user@192.168.1.100", "ssh -p 8022 localhost"],
     },
-
     # --- Package management ---
     "pkg": {
         "synopsis": "pkg [command] [package]",
         "category": "packages",
         "noob":    "Termux's app store for the terminal. Use it to install tools like python, git, ffmpeg etc.",
         "learner": "Termux package manager. install/uninstall/upgrade/search/list/show. Always run pkg update before installing.",
-        "pro":     "pkg install/uninstall/upgrade/search/list/show/clean. Wraps apt. Repos in /data/data/com.termux/files/usr/etc/apt/.",
+        "pro":     "pkg install/uninstall/upgrade/search/list/show/clean. Wraps apt. Repos in $PREFIX/etc/apt/.",
         "examples": ["pkg install python3", "pkg search ffmpeg", "pkg update && pkg upgrade -y"],
     },
     "pip": {
@@ -219,7 +226,6 @@ COMMAND_DICT = {
         "pro":     "npm install pkg. npm install -g (global). npm init -y. npm run script. npm ls.",
         "examples": ["npm install express", "npm init -y", "npm install -g nodemon"],
     },
-
     # --- Git ---
     "git": {
         "synopsis": "git [command]",
@@ -325,7 +331,6 @@ COMMAND_DICT = {
         "pro":     "git stash. git stash pop. git stash apply. git stash list. git stash drop.",
         "examples": ["git stash", "git stash pop", "git stash list"],
     },
-
     # --- Process management ---
     "ps": {
         "synopsis": "ps [options]",
@@ -367,7 +372,6 @@ COMMAND_DICT = {
         "pro":     "htop. htop -u user. htop -d 5 (5 tenths sec delay).",
         "examples": ["htop"],
     },
-
     # --- System info ---
     "df": {
         "synopsis": "df [options] [path]",
@@ -417,7 +421,6 @@ COMMAND_DICT = {
         "pro":     "date. date '+%Y-%m-%d %H:%M:%S'. date -d 'yesterday'. date +%s (unix timestamp).",
         "examples": ["date", "date '+%Y-%m-%d'"],
     },
-
     # --- Text editing ---
     "nano": {
         "synopsis": "nano [file]",
@@ -435,7 +438,6 @@ COMMAND_DICT = {
         "pro":     ":w :q :wq :q! :x. dd=delete line, yy=yank, p=paste, u=undo, /pattern, n=next.",
         "examples": ["vim file.txt"],
     },
-
     # --- Shell / scripting ---
     "echo": {
         "synopsis": "echo [text]",
@@ -485,7 +487,6 @@ COMMAND_DICT = {
         "pro":     "clear. Ctrl+L. reset (if terminal is broken).",
         "examples": ["clear"],
     },
-
     # --- Python ---
     "python3": {
         "synopsis": "python3 [file] or python3 -c 'code'",
@@ -495,7 +496,6 @@ COMMAND_DICT = {
         "pro":     "python3 script.py. python3 -c 'import sys; print(sys.version)'. python3 -m http.server.",
         "examples": ["python3 script.py", "python3 -m http.server 8080", "python3 -c 'print(2**10)'"],
     },
-
     # --- Termux-specific ---
     "termux-setup-storage": {
         "synopsis": "termux-setup-storage",
@@ -521,7 +521,6 @@ COMMAND_DICT = {
         "pro":     "termux-share file. termux-share -a send -t text/plain file.",
         "examples": ["termux-share myfile.txt"],
     },
-
     # --- tmux ---
     "tmux": {
         "synopsis": "tmux [command]",
@@ -531,52 +530,205 @@ COMMAND_DICT = {
         "pro":     "tmux new -s name. tmux attach -t name. Ctrl+B: % | \" d c n p x z.",
         "examples": ["tmux", "tmux new -s work", "tmux attach -t work"],
     },
+    # --- Additional text tools ---
+    "sed": {
+        "synopsis": "sed [options] 'expression' [file]",
+        "category": "text",
+        "noob":    "Finds and replaces text inside files — like find-and-replace but for the terminal.",
+        "learner": "Stream editor. s/old/new/g substitutes text. -i edits file in place. -n suppresses output. /d deletes lines.",
+        "pro":     "sed 's/old/new/g' file. sed -i 's/foo/bar/g' file. sed -n '/pattern/p'. sed '/^#/d'.",
+        "examples": ["sed 's/hello/world/g' file.txt", "sed -i 's/foo/bar/g' config.py"],
+    },
+    "awk": {
+        "synopsis": "awk 'program' [file]",
+        "category": "text",
+        "noob":    "Processes text files column by column — very useful for extracting specific pieces of data.",
+        "learner": "Text processing. $1,$2 are columns. NR=line number. /pattern/ filters. '{print $2}' prints column 2.",
+        "pro":     "awk '{print $1}'. awk -F: '{print $1}' /etc/passwd. awk 'NR>1 && $3>100'.",
+        "examples": ["awk '{print $1}' file.txt", "awk -F',' '{print $2}' data.csv"],
+    },
+    "sort": {
+        "synopsis": "sort [options] [file]",
+        "category": "text",
+        "noob":    "Sorts the lines of a file in alphabetical or numerical order.",
+        "learner": "Sort lines. -n numeric, -r reverse, -u unique (remove duplicates), -k column, -t separator.",
+        "pro":     "sort -n. sort -rn. sort -u. sort -k2 -t,. sort -h (human: 1K < 1M).",
+        "examples": ["sort file.txt", "sort -rn numbers.txt", "sort -u list.txt"],
+    },
+    "wc": {
+        "synopsis": "wc [options] [file]",
+        "category": "text",
+        "noob":    "Counts the lines, words, and characters in a file.",
+        "learner": "Word count. -l lines only, -w words, -c bytes, -m characters. cat file | wc -l counts piped input.",
+        "pro":     "wc -l file. wc -l *.py. cat file | wc -w.",
+        "examples": ["wc -l file.txt", "wc -l *.py"],
+    },
+    "head": {
+        "synopsis": "head [options] [file]",
+        "category": "text",
+        "noob":    "Shows the first few lines of a file — by default the first 10 lines.",
+        "learner": "Print first N lines. -n 20 shows 20 lines. head -c 100 shows first 100 bytes.",
+        "pro":     "head -n 20 file. head -c 1024 file. head -n -5 (all but last 5).",
+        "examples": ["head file.txt", "head -n 20 log.txt"],
+    },
+    "tail": {
+        "synopsis": "tail [options] [file]",
+        "category": "text",
+        "noob":    "Shows the last few lines of a file. Use 'tail -f' to watch a file update in real time.",
+        "learner": "Print last N lines. -n 20 shows 20 lines. -f follows file as it grows (great for logs).",
+        "pro":     "tail -n 20 file. tail -f log.txt. tail -f -n 0 (only new lines). tail -c 1024.",
+        "examples": ["tail -f log.txt", "tail -n 20 error.log"],
+    },
+    "jq": {
+        "synopsis": "jq [filter] [file]",
+        "category": "text",
+        "noob":    "Reads and filters JSON files — like a search tool specifically for JSON data.",
+        "learner": "JSON processor. . pretty-prints. .key extracts field. .[0] array index. | pipes. map() transforms arrays.",
+        "pro":     "jq '.key'. jq '.[0].name'. jq '.[] | select(.age > 18)'. jq -r (raw string output).",
+        "examples": ["jq '.' data.json", "jq '.name' user.json", "curl api.example.com | jq '.results[]'"],
+    },
+    "ssh-keygen": {
+        "synopsis": "ssh-keygen [options]",
+        "category": "network",
+        "noob":    "Creates a pair of SSH keys so you can connect to GitHub or remote servers without a password.",
+        "learner": "Generate SSH key pair. -t ed25519 (modern) or rsa. -b key size. -C comment (email). Keys go to ~/.ssh/.",
+        "pro":     "ssh-keygen -t ed25519 -C 'email'. ssh-keygen -t rsa -b 4096. ssh-keygen -f ~/.ssh/custom_key.",
+        "examples": ["ssh-keygen -t ed25519 -C 'your@email.com'", "ssh-keygen -t rsa -b 4096"],
+    },
 }
 
 # ---------------------------------------------------------------------------
-# Explainer functions
+# Library layer — loaded lazily from data/library.json
+# Built by tools/fetch_library.py from LinuxCommandLibrary.com (Apache 2.0)
+# ---------------------------------------------------------------------------
+
+_LIBRARY_DATA  = None
+_LIBRARY_LOADED = False
+
+_LIBRARY_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..", "data", "library.json"
+)
+
+def _load_library() -> dict:
+    """Load data/library.json once and cache it."""
+    global _LIBRARY_DATA, _LIBRARY_LOADED
+    if _LIBRARY_LOADED:
+        return _LIBRARY_DATA or {}
+    _LIBRARY_LOADED = True
+    try:
+        path = os.path.abspath(_LIBRARY_FILE)
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                raw = json.load(f)
+            _LIBRARY_DATA = raw.get("commands", {})
+        else:
+            _LIBRARY_DATA = {}
+    except Exception:
+        _LIBRARY_DATA = {}
+    return _LIBRARY_DATA
+
+
+def library_available() -> bool:
+    """True if the library data file exists and has entries."""
+    lib = _load_library()
+    return bool(lib)
+
+
+def library_size() -> int:
+    """Number of commands in the library."""
+    return len(_load_library())
+
+
+# ---------------------------------------------------------------------------
+# Lookup logic
 # ---------------------------------------------------------------------------
 
 def _normalize_cmd(cmd: str) -> str:
-    """Normalize command input for lookup."""
     return cmd.strip().lower()
 
 
-def lookup(cmd: str) -> dict | None:
-    """Find a command entry. Tries exact match then prefix match."""
+def _dict_lookup(cmd: str) -> dict | None:
+    """Look up in the curated COMMAND_DICT."""
     key = _normalize_cmd(cmd)
     if key in COMMAND_DICT:
         return COMMAND_DICT[key]
-    # Try just the first word
     first_word = key.split()[0]
     if first_word in COMMAND_DICT:
         return COMMAND_DICT[first_word]
     return None
 
 
-def explain(cmd: str, mode: str = "learner") -> str:
+def _library_lookup(cmd: str) -> dict | None:
     """
-    Explain a command in plain English.
-    Mode-aware depth: noob=story, learner=educational, pro=one-line.
-    Returns formatted explanation string.
+    Look up in the library.json layer.
+    Returns a normalized dict compatible with _format_entry().
     """
-    entry = lookup(cmd)
+    lib = _load_library()
+    if not lib:
+        return None
 
+    key = _normalize_cmd(cmd).split()[0]   # library keyed by bare command name
+
+    entry = lib.get(key)
     if not entry:
-        return (
-            f"I don't have offline documentation for '{cmd}' yet.\n"
-            f"Try: man {cmd.split()[0]}  or  {cmd.split()[0]} --help"
-        )
+        return None
 
-    desc = entry.get(mode, entry.get("learner", ""))
+    desc      = entry.get("description", "")
+    short     = entry.get("short", desc[:150] if desc else "")
+    examples  = entry.get("examples", [])
+    synopsis  = entry.get("synopsis", key)
+    category  = entry.get("category", "other")
+
+    if not short and not examples:
+        return None
+
+    # Synthesize mode-aware descriptions from the single description
+    noob_desc    = short or desc[:120]
+    learner_desc = desc[:280] if desc else short
+    pro_desc     = short[:100] if short else desc[:80]
+
+    return {
+        "synopsis": synopsis,
+        "category": category,
+        "noob":     noob_desc,
+        "learner":  learner_desc,
+        "pro":      pro_desc,
+        "examples": examples[:5],
+        "_source":  "library",   # internal tag for display
+    }
+
+
+def lookup(cmd: str) -> dict | None:
+    """
+    Find a command entry.
+    Priority: COMMAND_DICT (curated) → library.json (LCL data).
+    """
+    entry = _dict_lookup(cmd)
+    if entry:
+        return entry
+    return _library_lookup(cmd)
+
+
+# ---------------------------------------------------------------------------
+# Formatting
+# ---------------------------------------------------------------------------
+
+def _format_entry(cmd: str, entry: dict, mode: str) -> str:
+    """Format a command entry for terminal output, mode-aware."""
+    desc     = entry.get(mode, entry.get("learner", ""))
     synopsis = entry.get("synopsis", cmd)
     examples = entry.get("examples", [])
     category = entry.get("category", "")
+    source   = entry.get("_source", "")
+
+    # Source badge — only shown for library entries
+    src_tag = "  [Linux Command Library]\n" if source == "library" else ""
 
     if mode == "noob":
         lines = [
             f"  📖  {cmd.upper()}",
-            f"",
+            "",
             f"  {desc}",
         ]
         if examples:
@@ -586,13 +738,15 @@ def explain(cmd: str, mode: str = "learner") -> str:
         lines = [
             f"  📖  {cmd.upper()}  —  {synopsis}",
             f"  Category: {category}",
-            f"",
+            "",
             f"  {desc}",
         ]
         if examples:
             lines += ["", "  Examples:"]
             for ex in examples[:3]:
                 lines.append(f"    $ {ex}")
+        if src_tag.strip():
+            lines += ["", f"  {src_tag.strip()}"]
 
     else:  # pro
         lines = [f"  {synopsis}  —  {desc}"]
@@ -602,37 +756,100 @@ def explain(cmd: str, mode: str = "learner") -> str:
     return "\n".join(lines)
 
 
-def dictionary_lookup(cmd: str) -> str:
+def explain(cmd: str, mode: str = "learner") -> str:
     """
-    Concise one-line definition + synopsis.
-    Used for quick inline lookups.
+    Explain a command in plain English.
+    Mode-aware depth: noob=story, learner=educational, pro=one-line.
+    Checks COMMAND_DICT first, then library.json.
+    Returns formatted explanation string.
     """
     entry = lookup(cmd)
+
     if not entry:
-        return f"'{cmd}' not found in offline dictionary."
+        lib_size = library_size()
+        lib_hint = f" ({lib_size} commands in library)" if lib_size else " (run: python tools/fetch_library.py)"
+        return (
+            f"  I don't have offline documentation for '{cmd}' yet.{lib_hint}\n"
+            f"  Try: man {cmd.split()[0]}  or  {cmd.split()[0]} --help"
+        )
+
+    return _format_entry(cmd, entry, mode)
+
+
+def dictionary_lookup(cmd: str) -> str:
+    """Concise one-line definition + synopsis. Used for quick inline lookups."""
+    entry = lookup(cmd)
+    if not entry:
+        return f"  '{cmd}' not found in offline dictionary."
     synopsis = entry.get("synopsis", cmd)
     desc     = entry.get("learner", entry.get("noob", ""))[:80]
     return f"  {synopsis}  —  {desc}"
 
 
-def list_commands(category: str = None) -> list[str]:
-    """List all known commands, optionally filtered by category."""
-    if category:
-        return [k for k, v in COMMAND_DICT.items()
-                if v.get("category") == category]
-    return list(COMMAND_DICT.keys())
-
-
-def search_commands(query: str) -> list[tuple[str, str]]:
+def list_commands(category: str | None = None) -> list:
     """
-    Search command dictionary by keyword in name or description.
+    List all known commands, optionally filtered by category.
+    Combines COMMAND_DICT and library.
+    """
+    results = {}
+
+    for k, v in COMMAND_DICT.items():
+        if not category or v.get("category") == category:
+            results[k] = v.get("category", "")
+
+    lib = _load_library()
+    for k, v in lib.items():
+        if k not in results:
+            if not category or v.get("category") == category:
+                results[k] = v.get("category", "")
+
+    return list(results.keys())
+
+
+def search_commands(query: str) -> list:
+    """
+    Search by keyword in command name or description.
+    Searches both COMMAND_DICT and library.
     Returns list of (command, one-line-description).
     """
-    query = query.lower()
+    query   = query.lower()
     results = []
+    seen    = set()
+
+    # Search curated dict first
     for cmd, entry in COMMAND_DICT.items():
-        combined = (cmd + " " + entry.get("noob", "") + " " +
-                    entry.get("learner", "")).lower()
+        combined = (cmd + " " + entry.get("noob", "") + " " + entry.get("learner", "")).lower()
         if query in combined:
             results.append((cmd, entry.get("learner", "")[:70]))
+            seen.add(cmd)
+
+    # Then search library
+    lib = _load_library()
+    for cmd, entry in lib.items():
+        if cmd in seen:
+            continue
+        desc     = entry.get("description", "")
+        short    = entry.get("short", "")
+        combined = (cmd + " " + desc + " " + short).lower()
+        if query in combined:
+            results.append((cmd, short[:70] or desc[:70]))
+            seen.add(cmd)
+        if len(results) >= 20:
+            break
+
     return results
+
+
+def list_categories() -> list:
+    """List all available categories across dict and library."""
+    cats = set()
+    for entry in COMMAND_DICT.values():
+        c = entry.get("category")
+        if c:
+            cats.add(c)
+    lib = _load_library()
+    for entry in lib.values():
+        c = entry.get("category")
+        if c:
+            cats.add(c)
+    return sorted(cats)
