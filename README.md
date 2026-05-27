@@ -122,22 +122,11 @@ VERNUX 🟡 > library categories
 
 When you type something VERNUX doesn't recognise as a task, it automatically checks the library for matching commands and shows you what it knows — before giving up or asking the AI.
 
-After install, build the full offline library once (requires internet):
+The offline command library (710+ commands) is built automatically during install and refreshed on every `vernux update`. No manual steps needed.
 
+To rebuild manually if needed:
 ```bash
-# Step 1 — fetch Linux Command Library data (~500 commands)
-python tools/fetch_library.py
-
-# Step 2 — fetch tldr-pages data and merge (~200+ additional commands)
 python tools/build_library_tldr.py
-
-# Combined result: 700+ commands in data/library.json, fully offline after this
-```
-
-Quick build (faster, fewer commands):
-```bash
-python tools/fetch_library.py --quick
-python tools/build_library_tldr.py --quick
 ```
 
 ---
