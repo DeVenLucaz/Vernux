@@ -201,12 +201,41 @@ def refresh_recipes() -> dict:
         return {"ok": False, "count": 0, "message": f"Failed: {e}"}
 
 
+def refresh_library(verbose: bool = True) -> dict:
+    """
+    Rebuild the offline command library from tldr-pages.
+    Runs tools/build_library_tldr.py --quiet.
+    Returns {"ok": bool, "message": str}.
+    """
+    tool = os.path.join(INSTALL_DIR, "tools", "build_library_tldr.py")
+    if not os.path.exists(tool):
+        return {"ok": False, "message": "build_library_tldr.py not found"}
+    try:
+        result = subprocess.run(
+            [sys.executable, tool, "--quiet"],
+            cwd=INSTALL_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=120,
+        )
+        if result.returncode == 0:
+            return {"ok": True, "message": "Library refreshed"}
+        else:
+            err = (result.stderr or result.stdout or "unknown error").strip()[:120]
+            return {"ok": False, "message": err}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "message": "Library refresh timed out"}
+    except Exception as e:
+        return {"ok": False, "message": str(e)[:120]}
+
+
 def run_full_update(verbose: bool = True) -> dict:
     """
     Full update pipeline:
       1. Check for new code version
       2. Pull if available
-      3. Refresh pkg_cache, patterns, recipes regardless
+      3. Refresh pkg_cache, patterns, recipes, library regardless
     Returns summary dict.
     """
     results = {
@@ -214,6 +243,7 @@ def run_full_update(verbose: bool = True) -> dict:
         "pkg_cache":     None,
         "patterns":      None,
         "recipes":       None,
+        "library":       None,
         "version_check": None,
     }
 
@@ -234,5 +264,6 @@ def run_full_update(verbose: bool = True) -> dict:
     results["pkg_cache"] = refresh_pkg_cache()
     results["patterns"]  = refresh_patterns()
     results["recipes"]   = refresh_recipes()
+    results["library"]   = refresh_library()
 
     return results
