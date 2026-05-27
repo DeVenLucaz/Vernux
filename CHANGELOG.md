@@ -32,6 +32,30 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 ### Fixed
 
 - **`handle_update` NameError crash** — `vernux update` was crashing with `NameError: name 'handle_update' is not defined` because the function was called in `handle_cli_args()` and the main loop but never actually defined. Added `handle_update()` which runs `run_full_update()` and prints a clean mode-aware summary (noob gets friendly message, learner/pro get compact output).
+- **llama.cpp banner leak** — Old llama.cpp builds (`b0-unknown`) ignore `--log-disable` and dump the full startup banner, available commands menu, and echoed system prompt to **stdout** instead of stderr. Fixed with `--simple-io -e` flags and `_strip_banner()` helper in `modules/interpreter.py`.
+- **`_strip_banner()` over-stripping real AI output** — Strategy 2 of the banner stripper used a broad prefix list including words like `"model"`, `"version"`, `"cli"`, `"cpu"` which appear in normal English answers (e.g. `"A monorepo is a version..."`). This silently ate the AI's actual response. Fixed: Strategy 2 now first checks for definitive llama.cpp banner markers (`llama.cpp`, `available commands:`, `ggml_`, etc.) before doing any line-skipping. If no banner is detected, raw output is returned as-is. Skip prefix list tightened to only exact llama.cpp UI patterns.
+- **AI fallback ignoring question/explanation queries** — The system prompt told the AI to output only bash commands. When users asked questions like `"what is json"`, `validate_output()` rejected the natural language answer. Fixed by adding intent detection — question queries now route to `llm_query_explain()`.
+
+### Added
+
+- **`handle_update()`** — properly defined update handler in `vernux.py`.
+- **`_is_question()`** — intent classifier covering `what is`, `how does`, `explain`, `why is`, `difference between`, `how do i`, and similar phrasings.
+- **`_extract_topic()`** — strips question prefixes to extract core topic for follow-up hints.
+- **`_llm_explain_flow()`** — routes question queries to explain flow with mode-aware output (noob: plain English + learn more hint; learner: explanation + related command; pro: one line + shortcut).
+- **`try_llm_fallback()` reworked** — intent detection first, then routes to explain or command flow accordingly.
+
+### Changed
+
+- `modules/interpreter.py` — `_strip_banner()` rewritten with safer detection logic.
+- `modules/__init__.py` — version bumped to `0.7.4`.
+
+---
+
+## [v0.7.3] — Phase 6 — Pattern Builder — 2026-05-27
+
+### Fixed
+
+- **`handle_update` NameError crash** — `vernux update` was crashing with `NameError: name 'handle_update' is not defined` because the function was called in `handle_cli_args()` and the main loop but never actually defined. Added `handle_update()` which runs `run_full_update()` and prints a clean mode-aware summary (noob gets friendly message, learner/pro get compact output).
 - **llama.cpp banner leak** — Old llama.cpp builds (`b0-unknown`) ignore `--log-disable` and dump the full startup banner, available commands menu, and echoed system prompt to **stdout** instead of stderr, causing all of that noise to appear in the terminal and corrupt the AI output. Fixed with two layers:
   1. Added `--simple-io` and `-e` flags to the llama-cli invocation — these suppress interactive UI on older builds.
   2. Added `_strip_banner()` helper in `modules/interpreter.py` — strips everything before the actual AI response using the prompt tail as an anchor, with a heuristic line-scanner fallback for builds that mangle the output differently.
