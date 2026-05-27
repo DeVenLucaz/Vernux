@@ -40,6 +40,38 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
   - Category auto-detection using the same category map as the rest of VERNUX
   - Full meta block written to library.json tracking entry counts per source
 
+- **710+ command offline library** — tldr-pages adds ~200 entries not covered by LinuxCommandLibrary, including all major git subcommands (`git-clone`, `git-checkout`, `git-stash`, etc.), termux-specific tools, and modern CLI utilities (`fzf`, `bat`, `ripgrep`, `fd`, `httpie`).
+
+- **Automatic library build on install** — `install.sh` now runs `build_library_tldr.py --quiet` automatically as Step 7b. New users get the full 710+ command library immediately after install with no manual steps.
+
+- **Automatic library refresh on update** — `modules/updater.py` now includes `refresh_library()` which runs `build_library_tldr.py --quiet` as part of the `run_full_update()` pipeline. Every `vernux update` now refreshes the command library alongside patterns, recipes, and pkg cache. `handle_update()` in `vernux.py` shows "Command library refreshed" in the update summary.
+
+### Changed
+
+- **README.md** — removed manual library build instructions (now automatic), updated tldr-pages credits section, updated library badge to 700+.
+- **`modules/updater.py`** — added `refresh_library()` function and `"library"` key to `run_full_update()` results dict.
+- **`vernux.py`** — `handle_update()` now shows library refresh status in the update summary output.
+- **`modules/__init__.py`** — version bumped to `0.7.5`.
+
+### Why this matters
+
+Before this, VERNUX's AI fallback was the only way to answer `what is git stash` or `explain fzf`. Now the offline library handles hundreds more queries without touching the model at all — faster, works without a downloaded model, and gives mode-aware answers with real examples. And it all happens automatically.
+
+---
+
+## [v0.7.4] — Phase 6 — AI Fallback Fix — 2026-05-27
+
+### Added
+
+- **`tools/build_library_tldr.py`** — new build tool that downloads the tldr-pages zip (~5MB, CC0 public domain), parses `pages/android/`, `pages/linux/`, and `pages/common/` platforms, and converts them into VERNUX's offline library format. Key features:
+  - Mode-aware output generation — noob gets description + first example walkthrough, learner gets description + up to 3 annotated examples, pro gets one-line summary
+  - Smart merge — by default, existing LCL entries win (richer data), tldr fills gaps only. `--overwrite` flag available for reverse priority
+  - `--quick` mode for android + common only (faster for low-storage devices)
+  - `--cmd <name>` for testing a single command parse
+  - Placeholder cleanup — converts `{{arg}}` syntax to readable `<arg>`
+  - Category auto-detection using the same category map as the rest of VERNUX
+  - Full meta block written to library.json tracking entry counts per source
+
 - **700+ command offline library** — running both `tools/fetch_library.py` and `tools/build_library_tldr.py` now produces a combined `data/library.json` covering 700+ commands. tldr-pages adds ~200 entries not covered by LinuxCommandLibrary, including all major git subcommands (`git-clone`, `git-checkout`, `git-stash`, etc.), termux-specific tools, and modern CLI utilities (`fzf`, `bat`, `ripgrep`, `fd`, `httpie`).
 
 ### Changed
