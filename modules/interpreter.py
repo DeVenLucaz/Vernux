@@ -461,20 +461,25 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
         cmd += ["--reverse-prompt", st]
 
     # Run with timeout
-    # stderr=DEVNULL suppresses llama.cpp startup banner.
-    # Old builds (b0-unknown) ignore --log-disable and dump banner to stdout,
-    # so we strip everything before the assistant response using the prompt tail.
+    # Old builds (b0-unknown) may write response to stderr instead of stdout.
+    # Capture both and prefer stdout, fall back to stderr.
     try:
         start  = time.time()
         result = subprocess.run(
             cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
             timeout=timeout,
         )
         elapsed = round(time.time() - start, 1)
-        raw     = _strip_banner(result.stdout, prompt)
+        raw_stdout = _strip_banner(result.stdout, prompt)
+        raw_stderr = _strip_banner(result.stderr, prompt)
+        raw        = raw_stdout if raw_stdout else raw_stderr
+    except subprocess.TimeoutExpired:
+        return None
+    except Exception:
+        return None
     except subprocess.TimeoutExpired:
         return None
     except Exception:
@@ -558,11 +563,15 @@ def query_explain(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None
         result = subprocess.run(
             cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
             timeout=timeout,
         )
-        raw = _strip_banner(result.stdout, prompt)
+        # Old llama.cpp builds may write the actual response to stderr
+        # Prefer stdout if it has real content, otherwise fall back to stderr
+        raw_stdout = _strip_banner(result.stdout, prompt)
+        raw_stderr = _strip_banner(result.stderr, prompt)
+        raw = raw_stdout if raw_stdout else raw_stderr
     except subprocess.TimeoutExpired:
         return None
     except Exception:
@@ -607,7 +616,7 @@ def download_model(model: dict, on_progress=None) -> bool:
         url
     ]
 
-    # # Fallback: curl
+    # Fallback: curl
     curl_cmd = [
         "curl",
         "-L",                      # follow redirects
