@@ -1,6 +1,6 @@
 # =============================================================================
 # modules/interpreter.py — Local LLM Fallback Engine
-# Version: 0.5.0 | Phase 4 — Local AI
+# Version: 0.7.4 | Phase 6 — AI Fallback Fix
 # =============================================================================
 #
 # Called only when pattern matching fails (confidence < threshold).
@@ -208,6 +208,58 @@ def _set_cached(user_input: str, command: str):
 
 
 # ---------------------------------------------------------------------------
+# Banner stripper — removes llama.cpp startup noise from stdout
+# Old builds (b0-unknown) print the banner + full prompt to stdout even with
+# --log-disable. We strip everything up to and including the prompt tail.
+# ---------------------------------------------------------------------------
+
+def _strip_banner(raw: str, prompt: str) -> str:
+    """
+    Strip llama.cpp banner and echoed prompt from stdout.
+    Tries to find the last line of the prompt in the output and
+    returns only what comes after it.
+    Falls back to heuristic line-skipping if prompt not found.
+    """
+    if not raw:
+        return ""
+
+    # Strategy 1: find the tail of the prompt in the output
+    # Use last 60 chars of prompt as anchor (avoids format prefix noise)
+    anchor = prompt.strip()[-60:].strip()
+    idx = raw.find(anchor)
+    if idx != -1:
+        after = raw[idx + len(anchor):].strip()
+        if after:
+            return after
+
+    # Strategy 2: skip lines that look like banner/info (llama.cpp startup)
+    # Banner lines typically start with known patterns
+    BANNER_PREFIXES = (
+        "llama", "build", "model", "modalities", "available commands",
+        "/exit", "/regen", "/clear", "/read", "/glob",
+        "> <", "ggml", "load_tensors", "llm_load", "sampling", "generate",
+        "[ prompt", "[ generation", "system_info", "main:", "warning:",
+        "Log start", "cli", "version", "cpu", "metal", "cuda",
+    )
+    lines = raw.splitlines()
+    result_lines = []
+    skip_mode = True
+    for line in lines:
+        stripped = line.strip()
+        if skip_mode:
+            low = stripped.lower()
+            if any(low.startswith(p) for p in BANNER_PREFIXES):
+                continue
+            if not stripped:
+                continue
+            # First non-banner line — switch off skip mode
+            skip_mode = False
+        result_lines.append(line)
+
+    return "\n".join(result_lines).strip()
+
+
+# ---------------------------------------------------------------------------
 # Output validation
 # ---------------------------------------------------------------------------
 
@@ -376,12 +428,16 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
         "--threads",    str(max(1, (profile.get("cpu", {}).get("cores", 2)) - 1)),
         "--no-display-prompt",
         "--log-disable",
+        "--simple-io",
+        "-e",
     ]
     for st in stop_tokens:
         cmd += ["--reverse-prompt", st]
 
     # Run with timeout
-    # stderr=DEVNULL suppresses llama.cpp startup banner (version 0/unknown ignores --log-disable)
+    # stderr=DEVNULL suppresses llama.cpp startup banner.
+    # Old builds (b0-unknown) ignore --log-disable and dump banner to stdout,
+    # so we strip everything before the assistant response using the prompt tail.
     try:
         start  = time.time()
         result = subprocess.run(
@@ -392,7 +448,7 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
             timeout=timeout,
         )
         elapsed = round(time.time() - start, 1)
-        raw     = result.stdout.strip()
+        raw     = _strip_banner(result.stdout, prompt)
     except subprocess.TimeoutExpired:
         return None
     except Exception:
@@ -466,6 +522,8 @@ def query_explain(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None
         "--threads",    str(max(1, (profile.get("cpu", {}).get("cores", 2)) - 1)),
         "--no-display-prompt",
         "--log-disable",
+        "--simple-io",
+        "-e",
     ]
     for st in stop_tokens:
         cmd += ["--reverse-prompt", st]
@@ -478,7 +536,7 @@ def query_explain(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None
             text=True,
             timeout=timeout,
         )
-        raw = result.stdout.strip()
+        raw = _strip_banner(result.stdout, prompt)
     except subprocess.TimeoutExpired:
         return None
     except Exception:
