@@ -4,8 +4,9 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Termux-green.svg)]()
-[![Version](https://img.shields.io/badge/Version-v0.6.0-orange.svg)]()
-[![Patterns](https://img.shields.io/badge/Patterns-151-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/Version-v0.7.3-orange.svg)]()
+[![Patterns](https://img.shields.io/badge/Patterns-151%2B-brightgreen.svg)]()
+[![Library](https://img.shields.io/badge/Library-500%2B%20commands-blue.svg)]()
 [![Recipes](https://img.shields.io/badge/Recipes-10-brightgreen.svg)]()
 [![Free Forever](https://img.shields.io/badge/Free-Forever-brightgreen.svg)]()
 
@@ -55,7 +56,11 @@ vernux doctor                 # check your full setup (23 checks)
 vernux update                 # update VERNUX + refresh data files
 vernux stats                  # session summary
 vernux config mode learner    # change mode (noob / learner / pro)
-vernux explain grep           # explain any bash command
+vernux explain grep           # explain any command (500+ offline)
+vernux library grep           # full command reference card
+vernux library search <term>  # search across 500+ commands
+vernux library related grep   # find commands in the same category
+vernux library categories     # browse all command categories
 vernux recipes                # list all built-in recipes
 vernux --version              # show version
 ```
@@ -69,6 +74,8 @@ VERNUX 🟢 > compress my folder
 VERNUX 🟢 > push my project to github
 VERNUX 🟢 > backup termux to sdcard
 VERNUX 🟢 > make termux look good
+VERNUX 🟢 > what does ripgrep do
+VERNUX 🟢 > search for text in files
 ```
 
 ---
@@ -98,6 +105,29 @@ Every command is classified before it runs:
 
 **Protected paths** (`/sdcard/`, `~/.ssh/`, Termux binaries) are never auto-run with dangerous commands.  
 **Hard stops** (rm -rf /, fork bombs, dd to disk) are blocked regardless of mode or confirmation.
+
+---
+
+## Offline Command Library
+
+VERNUX ships with a built-in command reference library covering 500+ commands — no internet, no app switching, no separate reference app needed.
+
+```
+VERNUX 🟡 > library grep
+VERNUX 🟡 > library search compress files
+VERNUX 🟡 > library category network
+VERNUX 🟡 > library related curl
+VERNUX 🟡 > library categories
+```
+
+When you type something VERNUX doesn't recognise as a task, it automatically checks the library for matching commands and shows you what it knows — before giving up or asking the AI.
+
+After install, build the library once (requires internet):
+
+```bash
+python tools/fetch_library.py          # full build (~500 commands)
+python tools/fetch_library.py --quick  # quick build (60 priority commands)
+```
 
 ---
 
@@ -133,10 +163,10 @@ VERNUX 🟡 > how does git stash work
 VERNUX 🟡 > explain search download
 ```
 
-60+ commands with mode-aware depth:
-- **Noob**: plain English story ("like Ctrl+F but for the terminal")
-- **Learner**: flags breakdown + examples
-- **Pro**: one-liner + flags reference
+Explanation lookup uses a three-layer system:
+1. **Built-in dictionary** — 60+ Termux-curated entries with full noob/learner/pro depth
+2. **Offline library** — 500+ commands from the Linux Command Library (built once at install)
+3. **Local AI** — if a model is installed and both layers miss
 
 ---
 
@@ -217,8 +247,9 @@ Requires llama.cpp: `pkg install llama-cpp`
 | 2 | Knowledge Base | ✅ Complete |
 | 3 | Recipes | ✅ Complete |
 | 4 | Local AI | ✅ Complete |
-| **5** | **Polish & Release** | **✅ Complete** |
-| 6 | Community | 🔄 Planned |
+| 5 | Polish & Release | ✅ Complete |
+| **6** | **Library Enrichment** | **✅ Complete (v0.7.x)** |
+| 7 | Community | 🔄 Planned |
 
 ---
 
@@ -231,6 +262,35 @@ The easiest ways to contribute:
 - **Device notes** — report Termux quirks on your specific device in [docs/DEVICES.md](docs/DEVICES.md)
 - **Bug reports** — use the bug report issue template
 - **Pattern suggestions** — open a feature request for tasks not yet covered
+
+---
+
+## Data Sources & Credits
+
+VERNUX's offline knowledge base is built from the following open-source projects. We are grateful to their contributors.
+
+### Linux Command Library
+> Command reference data used in `data/library.json` and `modules/explainer.py`
+
+- **Source:** [LinuxCommandLibrary](https://github.com/SimonSchubert/LinuxCommandLibrary) by Simon Schubert
+- **License:** Apache License 2.0
+- **What we use:** Command descriptions, synopsis, and usage examples for 500+ Linux commands, fetched and converted to Vernux's offline format by `tools/fetch_library.py`
+- **Note:** Man page content within the app retains its original copyright per command author
+
+### NL2Bash Corpus
+> Natural language → command pairs used to generate trigger phrases in `data/patterns.json`
+
+- **Source:** [TellinaTool/nl2bash](https://github.com/TellinaTool/nl2bash) — Xi Victoria Lin, Chenglong Wang, Derry Wijaya, Luke Zettlemoyer (University of Washington)
+- **License:** MIT License (dataset in `data/bash/` is separately MIT licensed)
+- **Paper:** *NL2Bash: A Corpus and Semantic Parser for Natural Language Interface to the Linux Operating System* — [arxiv.org/abs/1802.08979](https://arxiv.org/abs/1802.08979)
+- **What we use:** English descriptions from `all.nl` paired with bash commands from `all.cm`. Filtered to Termux-relevant commands, cleaned, and converted to trigger phrases by `tools/build_patterns_db.py`
+
+### tldr-pages
+> Community cheatsheets used to generate trigger phrases and learner descriptions in `data/patterns.json`
+
+- **Source:** [tldr-pages/tldr](https://github.com/tldr-pages/tldr) — community-maintained
+- **License:** [Creative Commons CC0 1.0 Universal](https://github.com/tldr-pages/tldr/blob/main/LICENSE.md) (public domain dedication)
+- **What we use:** Example descriptions from `pages/android/`, `pages/linux/`, and `pages/common/` — converted to trigger phrases and learner descriptions by `tools/build_patterns_db.py`
 
 ---
 
