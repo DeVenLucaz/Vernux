@@ -3,7 +3,7 @@
 # Version: 0.6.0 | Phase 5 — Polish & Release
 # =============================================================================
 
-VERSION      = "0.7.5"
-VERSION_INFO = (0, 7, 5)
+VERSION      = "0.7.6"
+VERSION_INFO = (0, 7, 6)
 PHASE        = 6
 PHASE_NAME   = "Library Auto-suggest"
