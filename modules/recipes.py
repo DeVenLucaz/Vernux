@@ -269,7 +269,7 @@ def run_recipe(recipe: dict, mode: str, brand: str = "") -> bool:
     """
     session = get_session()
     title   = recipe.get("title", recipe["id"])
-    steps   = recipe.get("steps", [])
+    steps   = recipe.get("steps", [])[:]
     est_min = recipe.get("estimated_minutes", "?")
 
     # Recipe header
@@ -283,9 +283,34 @@ def run_recipe(recipe: dict, mode: str, brand: str = "") -> bool:
         print(f"{ui.YELLOW}  ⚠  Internet required{ui.RESET}")
     print(f"{ui.CYAN}{ui.BOLD}{'═' * 46}{ui.RESET}")
 
+    # Step preview — show what the recipe will do before asking yes/no
+    if mode != "pro":
+        print(f"\n  {ui.BOLD}What this will do:{ui.RESET}")
+        for i, step in enumerate(steps, 1):
+            key = "description_noob" if mode == "noob" else "description_learner"
+            desc = step.get(key) or step.get("title", "")
+            # Take only first line of description for preview
+            first_line = desc.splitlines()[0][:70] if desc else step.get("title", "")
+            print(f"  {ui.GRAY}{i:2d}. {first_line}{ui.RESET}")
+
+        # Show what info it needs from the user
+        params_needed = []
+        param_prompts_all = {}
+        for step in steps:
+            for p in step.get("params_needed", []):
+                if p not in params_needed:
+                    params_needed.append(p)
+                    param_prompts_all[p] = step.get("param_prompts", {}).get(p, p)
+
+        if params_needed:
+            print(f"\n  {ui.BOLD}It will ask you for:{ui.RESET}")
+            for p in params_needed:
+                print(f"  {ui.GRAY}  • {param_prompts_all[p]}{ui.RESET}")
+        print()
+
     # Confirm before starting (noob/learner)
     if mode != "pro":
-        if not ui.confirm("\n  Start this recipe?"):
+        if not ui.confirm("  Start this recipe?"):
             ui.print_info("Recipe cancelled.")
             return False
 
