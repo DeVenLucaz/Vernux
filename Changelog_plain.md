@@ -4,6 +4,13 @@ This file explains every update in simple language, no coding knowledge needed.
 
 ---
 
+## v0.7.6 — Recipe Preview — 28 May 2026
+
+### What was fixed
+- **Recipes were asking "yes or no?" before telling you what they'd do.** When you typed something like "push my project to github", VERNUX would show the recipe name, a one-line description, and "12 steps" — then immediately ask if you want to start. You had no idea what those 12 steps were, or what information it was going to ask you for. Now it shows you the full plan first. You see every step in plain English, and a list of everything it will ask you to type (like your GitHub username, your email, your repo name) — before the yes/no question appears.
+
+---
+
 ## v0.7.5 — Bigger Offline Brain — 28 May 2026
 
 ### What's new
