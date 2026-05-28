@@ -31,7 +31,7 @@ die()     { error "$1"; exit 1; }
 echo ""
 echo -e "${CYAN}${BOLD}╔════════════════════════════════════════╗${RESET}"
 echo -e "${CYAN}${BOLD}║         VERNUX Installer               ║${RESET}"
-echo -e "${CYAN}${BOLD}║  Natural Language for Termux — v0.7.5  ║${RESET}"
+echo -e "${CYAN}${BOLD}║  Natural Language for Termux — v0.7.6  ║${RESET}"
 echo -e "${CYAN}${BOLD}╚════════════════════════════════════════╝${RESET}"
 echo ""
 
