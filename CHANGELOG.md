@@ -27,6 +27,21 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.7.6] — Phase 6 — Recipe Preview — 2026-05-28
+
+### Fixed
+
+- **Recipe confirmation had no context.** When a recipe matched (e.g. "push my project to github"), VERNUX showed the title, description, step count, and estimated time — then immediately asked "Start this recipe? [y/N]". The user had no idea what the recipe would actually do or what information it would ask for before committing. Fixed by adding a full step preview before the confirmation prompt.
+
+### Added
+
+- **Recipe step preview** — before asking "Start this recipe?", VERNUX now shows:
+  - A numbered list of every step with a plain English description (mode-aware: noob gets the noob description, learner gets the learner description)
+  - A "It will ask you for:" section listing every input the recipe needs from the user (e.g. "Your GitHub username", "Repository name on GitHub", "Your GitHub email")
+  - This gives the user full context to decide yes or no before anything runs
+
+---
+
 ## [v0.7.5] — Phase 6 — Database Expansion — 2026-05-28
 
 ### Added
@@ -56,32 +71,6 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 ### Why this matters
 
 Before this, VERNUX's AI fallback was the only way to answer `what is git stash` or `explain fzf`. Now the offline library handles hundreds more queries without touching the model at all — faster, works without a downloaded model, and gives mode-aware answers with real examples. And it all happens automatically.
-
----
-
-## [v0.7.4] — Phase 6 — AI Fallback Fix — 2026-05-27
-
-### Added
-
-- **`tools/build_library_tldr.py`** — new build tool that downloads the tldr-pages zip (~5MB, CC0 public domain), parses `pages/android/`, `pages/linux/`, and `pages/common/` platforms, and converts them into VERNUX's offline library format. Key features:
-  - Mode-aware output generation — noob gets description + first example walkthrough, learner gets description + up to 3 annotated examples, pro gets one-line summary
-  - Smart merge — by default, existing LCL entries win (richer data), tldr fills gaps only. `--overwrite` flag available for reverse priority
-  - `--quick` mode for android + common only (faster for low-storage devices)
-  - `--cmd <name>` for testing a single command parse
-  - Placeholder cleanup — converts `{{arg}}` syntax to readable `<arg>`
-  - Category auto-detection using the same category map as the rest of VERNUX
-  - Full meta block written to library.json tracking entry counts per source
-
-- **700+ command offline library** — running both `tools/fetch_library.py` and `tools/build_library_tldr.py` now produces a combined `data/library.json` covering 700+ commands. tldr-pages adds ~200 entries not covered by LinuxCommandLibrary, including all major git subcommands (`git-clone`, `git-checkout`, `git-stash`, etc.), termux-specific tools, and modern CLI utilities (`fzf`, `bat`, `ripgrep`, `fd`, `httpie`).
-
-### Changed
-
-- **README.md** — updated tools section with two-step library build instructions, updated library badge to 700+, expanded tldr-pages credits section to document the new `build_library_tldr.py` tool and what it contributes.
-- **`modules/__init__.py`** — version bumped to `0.7.5`.
-
-### Why this matters
-
-Before this, VERNUX's AI fallback was the only way to answer `what is a monorepo` or `explain git stash`. Now the offline library handles hundreds more queries without touching the model at all — faster, works without a downloaded model, and gives mode-aware answers with real examples.
 
 ---
 
@@ -135,32 +124,6 @@ Before this, VERNUX's AI fallback was the only way to answer `what is a monorepo
 
 - `modules/interpreter.py` — `query()` and `query_explain()` both now call `_strip_banner()` on raw stdout before processing.
 - `modules/__init__.py` — version bumped to `0.7.4`.
-
----
-
-## [v0.7.3] — Phase 6 — Pattern Builder — 2026-05-27
-
-### Added
-- **`tools/build_patterns_db.py`** — new dev tool that automatically builds and expands `data/patterns.json` from two open-source datasets:
-  1. **NL2Bash (MIT)** — ~9,000 natural language ↔ bash command pairs sourced from StackOverflow. Converts them into Vernux's pattern format.
-  2. **tldr-pages (CC0)** — community cheatsheet pages (one per command), downloaded as a zip and parsed into patterns.
-  - Output: `data/patterns_generated.json` (new patterns only) and an updated `data/patterns.json` (merged, no duplicates).
-  - Flags: `--nl2bash`, `--tldr`, `--dry-run` (stats only), `--limit N` (cap new patterns).
-  - Generated patterns carry `source_credit` tags (`nl2bash` / `tldr`) and use `description_learner` only — noob descriptions require human review.
-- **`tools/review_patterns.py`** — new dev tool to audit generated patterns after running `build_patterns_db.py`.
-  - Walks through patterns that are missing `description_noob` and prompts for human-written ones.
-  - Flags: `--source nl2bash|tldr` (filter by source), `--stats` (coverage overview), `--auto-noob` (auto-generate basic noob descriptions from learner descriptions using a verb-mapping table).
-- **`tools/fetch_library.py`** — moved from v0.7.0 into the `tools/` directory (previously only referenced in docs, now properly tracked as a dev tool).
-
-### Changed
-- `tools/` directory is now the canonical home for all data-pipeline dev tools (`build_db.py`, `build_patterns_db.py`, `fetch_library.py`, `review_patterns.py`).
-- `modules/explainer.py` — minor updates to support pattern source attribution.
-- `vernux.py` — minor updates in sync with explainer changes.
-- `CHANGELOG.md` — updated with this entry.
-
-### Notes
-- `data/patterns_generated.json` is not included in the repo by default — it is produced locally by running `build_patterns_db.py`.
-- Generated patterns are merged into `data/patterns.json` only after review with `review_patterns.py --auto-noob` or manual editing.
 
 ---
 
