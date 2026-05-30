@@ -4,7 +4,7 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Termux-green.svg)]()
-[![Version](https://img.shields.io/badge/Version-v0.7.5-orange.svg)]()
+[![Version](https://img.shields.io/badge/Version-v0.8.0-orange.svg)]()
 [![Patterns](https://img.shields.io/badge/Patterns-151%2B-brightgreen.svg)]()
 [![Library](https://img.shields.io/badge/Library-700%2B%20commands-blue.svg)]()
 [![Recipes](https://img.shields.io/badge/Recipes-10-brightgreen.svg)]()
@@ -62,6 +62,7 @@ vernux library search <term>  # search across 500+ commands
 vernux library related grep   # find commands in the same category
 vernux library categories     # browse all command categories
 vernux recipes                # list all built-in recipes
+vernux ai-setup               # configure AI backend (API key or local model)
 vernux --version              # show version
 ```
 
@@ -165,8 +166,8 @@ VERNUX 🟡 > explain search download
 
 Explanation lookup uses a three-layer system:
 1. **Built-in dictionary** — 60+ Termux-curated entries with full noob/learner/pro depth
-2. **Offline library** — 500+ commands from the Linux Command Library (built once at install)
-3. **Local AI** — if a model is installed and both layers miss
+2. **Offline library** — 710+ commands from Linux Command Library + tldr-pages (built at install)
+3. **AI fallback** — local model or API, if both layers miss (see [AI section](#ai-optional))
 
 ---
 
@@ -206,23 +207,54 @@ On low-RAM devices, VERNUX warns before installing heavy packages and suggests l
 
 ---
 
-## Local AI (Optional)
+## AI (Optional)
 
-If pattern matching doesn't know how to handle something, VERNUX can fall back to a local AI model — no internet, no API, no cost.
+When pattern matching doesn't know how to handle something, VERNUX falls back to AI. You have two options — use either, or both.
+
+### Option 1 — Any API provider
+
+Connect VERNUX to any AI service with an API key. No model download, no storage needed, works instantly.
 
 ```bash
-# Inside VERNUX:
-install-model
+# Inside VERNUX or from terminal:
+ai-setup
+```
+
+Supported providers out of the box:
+
+| Provider | Free tier | Notes |
+|---|---|---|
+| OpenRouter | ✅ Yes | Free models (Mistral 7B etc.) — [openrouter.ai/keys](https://openrouter.ai/keys) |
+| Groq | ✅ Yes | Fast free Llama 3 — [console.groq.com/keys](https://console.groq.com/keys) |
+| Google Gemini | ✅ Yes (quota) | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| xAI Grok | ❌ Paid | [console.x.ai](https://console.x.ai) |
+| OpenAI (ChatGPT) | ❌ Paid | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| Anthropic Claude | ❌ Paid | [console.anthropic.com](https://console.anthropic.com) |
+| Mistral | ❌ Paid | [console.mistral.ai](https://console.mistral.ai) |
+| Custom URL | — | Ollama, LM Studio, llama.cpp server, any OpenAI-compatible endpoint |
+
+**Privacy:** your key is stored in `~/.vernux/api_keys.json` with `chmod 600` (readable only by you). It is never sent anywhere except the provider you choose. VERNUX shows a one-time notice explaining this before asking for your key. Remove it anytime with `ai-setup`.
+
+### Option 2 — Local model (fully offline)
+
+Run AI on your phone with no internet, no API, no cost. Requires [llamdrop](https://github.com/ypatole035-ai/llamdrop) to be installed — VERNUX uses llamdrop's binary and models directly, so there's no duplication if you already have it.
+
+```bash
+# Install llamdrop first, then:
+vernux install-model
 ```
 
 VERNUX picks the right model for your device's RAM:
-- **< 2GB**: Qwen2.5-Coder 1.5B Q4 (~1GB download)
-- **2–4GB**: Qwen2.5-Coder 1.5B Q6 or 3B Q4
-- **4GB+**: Phi-4 Mini Q4/Q6
+
+| RAM | Model | Download |
+|---|---|---|
+| < 2 GB | Qwen2.5-Coder 1.5B Q4 | ~1 GB |
+| 2–4 GB | Qwen2.5-Coder 1.5B Q6 or 3B Q4 | ~1.2–1.9 GB |
+| 4 GB+ | Phi-4 Mini Q4/Q6 | ~2.4–3.1 GB |
+
+If you already have llamdrop with a model downloaded, VERNUX detects it automatically — no setup needed.
 
 AI-generated commands always go through safety classification and require your confirmation before running.
-
-Requires llama.cpp: `pkg install llama-cpp`
 
 ---
 
@@ -235,6 +267,7 @@ Requires llama.cpp: `pkg install llama-cpp`
 | Python | 3.8+ — `pkg install python3` |
 | Storage | ~50MB for VERNUX + ~1GB if you want a local AI model |
 | Internet | Only for install and `vernux update` — runs fully offline after |
+| llamdrop | Optional — needed only for local AI model ([install](https://github.com/ypatole035-ai/llamdrop)) |
 
 ---
 
@@ -248,8 +281,9 @@ Requires llama.cpp: `pkg install llama-cpp`
 | 3 | Recipes | ✅ Complete |
 | 4 | Local AI | ✅ Complete |
 | 5 | Polish & Release | ✅ Complete |
-| **6** | **Library Enrichment** | **✅ Complete (v0.7.x)** |
-| 7 | Community | 🔄 Planned |
+| 6 | Library Enrichment | ✅ Complete (v0.7.x) |
+| **7** | **Unified AI Backend** | **✅ Complete (v0.8.0)** |
+| 8 | Community | 🔄 Planned |
 
 ---
 
