@@ -27,6 +27,57 @@ PATCH  — Bug fixes within a phase. Resets to 0 each MINOR bump.
 
 ---
 
+## [v0.8.0] — Phase 7 — Unified AI Backend — 2026-05-30
+
+### Changed
+
+- **`modules/interpreter.py` — complete rewrite.** The previous version had persistent, unfixable problems with llama.cpp output parsing on Android: banner leaking into responses, empty output on older builds, retry logic that didn't cover all failure modes. Rather than patching it again, the local inference engine was replaced wholesale with the battle-tested stack from [llamdrop](https://github.com/ypatole035-ai/llamdrop) — a separate project purpose-built for running local LLMs on Android/Termux. The subprocess threading pattern, `_extract_response()`, the prompt marker extraction, `_NOISE`/`_META_LINES` filters, and the retry-on-unsupported-flags logic are all ported directly from llamdrop's `chat.py`.
+
+- **Local backend now uses llamdrop's shared binary and models.** Instead of managing its own llama-cli binary, VERNUX now looks for `~/.llamdrop/bin/llama-cli` first — the same binary llamdrop installs. Models in `~/.llamdrop/models/` are detected automatically. If you already have llamdrop and a downloaded model, VERNUX's AI fallback works immediately with no extra setup. `~/.vernux/models/` is still checked as a fallback so existing downloads continue to work.
+
+### Added
+
+- **API backend — any OpenAI-compatible provider.** VERNUX can now use an external AI API instead of (or in addition to) a local model. Supported providers out of the box: OpenAI (ChatGPT), Google Gemini, xAI Grok, Anthropic Claude, OpenRouter, Groq, Mistral, and any custom OpenAI-compatible endpoint (Ollama server, LM Studio, llama.cpp server, etc.). Implemented using only `urllib` from the Python standard library — no `requests` package required.
+
+- **`vernux ai-setup` — interactive AI configuration wizard.** New command that walks the user through choosing and configuring their AI backend. Accessible as `vernux ai-setup` (CLI), `ai-setup` (REPL), or `setup ai` / `configure ai`. The wizard presents:
+  - Option 1: API provider — choose from a numbered list of known providers (each showing where to get a key), or enter a custom base URL. Shows a one-time privacy notice explaining exactly where the key is stored and that it never leaves the device except to the chosen provider.
+  - Option 2: Local model — checks for llamdrop binary and installed models, shows status, enables local backend.
+  - Option 3 (shown only if API is configured): remove the current API config.
+
+- **API key storage — `~/.vernux/api_keys.json`.** Keys are stored in a dedicated file separate from `config.json`. File permissions are set to `0o600` (owner read/write only) immediately after write. A one-time privacy notice is shown before any key is entered — it explains the file location, that it is readable only by the device owner, and that VERNUX is open source and can be audited. The notice is shown exactly once and never repeated.
+
+- **Anthropic Claude native API support.** Claude uses a different authentication header (`x-api-key` instead of `Authorization: Bearer`) and a different message structure. This is handled as a separate code path within the API backend — transparent to the user.
+
+- **`get_active_api_config()` / `set_api_config()` / `clear_api_config()`.** Public functions for reading, writing, and removing the active API configuration from `api_keys.json`.
+
+- **`run_ai_setup_wizard()`.** Public function that `vernux.py` calls for the `ai-setup` command. Also callable programmatically by other parts of the codebase if needed.
+
+- **`is_available()` now returns `True` for either backend.** Previously required `llm_enabled=True` + binary + model. Now also returns `True` if an API config exists — no local model needed.
+
+- **Unified response cache.** Both backends share the same `~/.vernux/llm_cache.json`. Cache keys are namespaced by query type (`cmd` vs `explain`) so a cached command response and a cached explanation for the same input don't collide.
+
+- **`ai status` REPL command updated.** Shows API provider and model if API backend is active; shows local model name and size if local backend is active.
+
+### Fixed
+
+- **Persistent llama.cpp output corruption on Android.** The previous `_strip_banner()` / `validate_output()` approach was fragile against the variety of llama-cli build versions found on Android. The new `_extract_response()` uses prompt marker detection first (reliable on all modern builds), falling back to line-by-line noise filtering only when no marker is found. The `_NOISE` and `_META_LINES` filter sets are tighter and more accurate.
+
+- **Retry on unsupported flags.** If the llama-cli binary is too old to support `--single-turn`, `--no-display-prompt`, `--simple-io`, or `--log-disable`, the subprocess now automatically retries without those flags rather than returning empty output.
+
+- **Spinner no longer freezes during inference.** Stdout is collected in a daemon thread using line-by-line iteration, releasing the GIL between reads. This was a known bug in the previous version where the spinner animation stopped while the model was running.
+
+### Changed (vernux.py)
+
+- Import block extended with `run_ai_setup_wizard`, `get_active_api_config`.
+- `print_help()` — AI status line now shows API provider/model when API backend is active, or local model name when local backend is active. Dead-end tip updated from `'install-model'` to `'ai-setup'`.
+- `handle_ai_setup()` added — thin wrapper that calls `run_ai_setup_wizard(mode)`.
+- `handle_cli_args()` — `ai-setup`, `ai_setup`, `setup-ai` all route to `handle_ai_setup()`.
+- REPL — `ai-setup`, `setup ai`, `configure ai`, `ai setup` all route to `handle_ai_setup()`.
+- REPL — `ai status` shows API config if active, local model otherwise.
+- `modules/__init__.py` — version bumped to `0.8.0`, `PHASE = 7`, `PHASE_NAME = "Unified AI Backend"`.
+
+---
+
 ## [v0.7.6] — Phase 6 — Recipe Preview — 2026-05-28
 
 ### Fixed
