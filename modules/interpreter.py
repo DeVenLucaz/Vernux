@@ -717,7 +717,7 @@ def _run_api_claude(user_input: str, system_prompt: str,
 
 
 def _api_error_hint(code: int, body: str):
-    """Print a concise, helpful API error message (non-fatal)."""
+    """Print a concise, helpful API error message (non-fatal). Deduped per query."""
     hints = {
         401: "API key rejected. Check your key in: vernux ai-setup",
         403: "Access forbidden. Your key may lack permissions for this model.",
@@ -725,8 +725,14 @@ def _api_error_hint(code: int, body: str):
         500: "Provider server error. Try again in a moment.",
     }
     msg = hints.get(code, f"API error {code}")
-    # Only print if not in a spinner context — keep it subtle
-    print(f"\n  ⚠  {msg}", flush=True)
+    # Dedupe: only print each error code once per query() call.
+    # _api_error_shown is reset in query() before each attempt.
+    if code not in _api_errors_shown_this_query:
+        _api_errors_shown_this_query.add(code)
+        print(f"\n  ⚠  {msg}", flush=True)
+
+# Tracks which error codes have already been printed in the current query() call.
+_api_errors_shown_this_query: set = set()
 
 
 # ---------------------------------------------------------------------------
@@ -742,6 +748,13 @@ VALID_CMD_STARTS = re.compile(
     r"./|~|/)",
     re.IGNORECASE
 )
+
+# llama-cli slash-commands that models sometimes bleed into their responses.
+# These are never valid bash commands — reject them outright in validate_output.
+_LLAMA_SLASH_CMDS = {
+    "/exit", "/regen", "/clear", "/read", "/glob",
+    "/reset", "/save", "/load", "/help",
+}
 
 IMPOSSIBLE_MARKER = "IMPOSSIBLE"
 
@@ -785,7 +798,11 @@ def validate_output(raw_output: str) -> str | None:
         line = line.strip().strip("`'\"").strip()
         if not line or line.upper() == IMPOSSIBLE_MARKER:
             continue
-        first = line.split()[0].lower() if line.split() else ""
+        # Reject llama.cpp slash-commands that models sometimes generate
+        first_word = line.split()[0].lower() if line.split() else ""
+        if first_word in _LLAMA_SLASH_CMDS or line.split()[0] in _LLAMA_SLASH_CMDS:
+            continue
+        first = first_word
         if first in _CHATTY_FIRST_WORDS:
             m = re.search(r":\s*(.+)$", line)
             if m:
@@ -836,6 +853,7 @@ def query(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
     if backend == "none":
         return None
 
+    _api_errors_shown_this_query.clear()
     cached = _get_cached(user_input, "cmd")
     if cached:
         return cached
@@ -870,6 +888,7 @@ def query_explain(user_input: str, timeout: int = DEFAULT_TIMEOUT) -> str | None
     if backend == "none":
         return None
 
+    _api_errors_shown_this_query.clear()
     cached = _get_cached(user_input, "explain")
     if cached:
         return cached
