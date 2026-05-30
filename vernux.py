@@ -29,7 +29,8 @@ from modules.interpreter    import (
     query as llm_query, is_available as llm_available,
     query_explain as llm_query_explain,
     select_model, list_installed_models,
-    download_model, get_download_advice
+    download_model, get_download_advice,
+    run_ai_setup_wizard, get_active_api_config,
 )
 from modules                import ui
 
@@ -426,7 +427,7 @@ def process_match(user_input: str, mode: str) -> None:
             if library_available():
                 tip = "try: explain <command>  or  library search <term>"
             elif not llm_available():
-                tip = "type 'install-model' to add AI, or try: library search <term>"
+                tip = "type 'ai-setup' to add AI (API or local model), or try: library search <term>"
             else:
                 tip = "try rephrasing"
             ui.print_info(f"I don't know how to do that yet. {tip}.")
@@ -712,6 +713,13 @@ def handle_install_model(mode: str):
 
 
 # ---------------------------------------------------------------------------
+# AI setup — configure API or local backend
+# ---------------------------------------------------------------------------
+def handle_ai_setup(mode: str):
+    run_ai_setup_wizard(mode)
+
+
+# ---------------------------------------------------------------------------
 # Help
 # ---------------------------------------------------------------------------
 def print_help(mode: str):
@@ -721,11 +729,15 @@ def print_help(mode: str):
     print()
     print(f"{ui.BOLD}  VERNUX v{VERSION} — {mode.upper()} mode{ui.RESET}")
     if llm_on:
-        installed = list_installed_models()
-        model_name = installed[0]['name'] if installed else "active"
-        print(f"  {ui.GREEN}🤖 Local AI: {model_name}{ui.RESET}")
+        api_cfg = get_active_api_config()
+        if api_cfg:
+            print(f"  {ui.GREEN}🤖 AI: {api_cfg.get('provider','API')} / {api_cfg.get('model','?')}{ui.RESET}")
+        else:
+            installed = list_installed_models()
+            model_name = installed[0]['name'] if installed else "active"
+            print(f"  {ui.GREEN}🤖 Local AI: {model_name}{ui.RESET}")
     else:
-        print(f"  {ui.GRAY}🤖 Local AI: not active — type 'install-model' to add it{ui.RESET}")
+        print(f"  {ui.GRAY}🤖 AI: not active — type 'ai-setup' to configure{ui.RESET}")
     lib_count = library_size()
     if lib_count:
         print(f"  {ui.GREEN}📚 Library: {lib_count} commands (Linux Command Library){ui.RESET}")
@@ -751,7 +763,8 @@ def print_help(mode: str):
         ("vernux explain <cmd>", "explain any command"),
         ("vernux config mode",   "noob / learner / pro"),
         ("vernux recipes",       "list all recipes"),
-        ("install-model",        "add local AI model"),
+        ("ai-setup",             "configure AI backend (API key or local model)"),
+        ("install-model",        "download a local GGUF model"),
         ("vernux library <cmd>",       "look up any command offline"),
         ("vernux library search <term>","keyword search across library"),
         ("vernux library related <cmd>","find commands in same category"),
@@ -852,6 +865,10 @@ def handle_cli_args(args: list) -> bool:
         handle_install_model(config_get("mode", "noob"))
         return True
 
+    if cmd in ("ai-setup", "ai_setup", "setup-ai"):
+        handle_ai_setup(config_get("mode", "noob"))
+        return True
+
     if cmd in ("--version", "-v", "version"):
         print(f"\n  VERNUX v{VERSION} — Phase {PHASE_NAME}")
         installed = list_installed_models()
@@ -938,13 +955,20 @@ def repl(mode: str):
         if lower in ("install-model", "install model", "add ai", "download model"):
             handle_install_model(mode)
             continue
+        if lower in ("ai-setup", "setup ai", "configure ai", "ai setup"):
+            handle_ai_setup(mode)
+            continue
         if lower in ("ai status", "llm status", "model status"):
-            installed = list_installed_models()
-            if installed:
-                for m in installed:
-                    print(f"\n  {ui.GREEN}✔ {m['name']} ({m['actual_size_mb']}MB) — active{ui.RESET}\n")
+            api_cfg = get_active_api_config()
+            if api_cfg:
+                print(f"\n  {ui.GREEN}✔ API backend: {api_cfg.get('provider','?')} / {api_cfg.get('model','?')}{ui.RESET}\n")
             else:
-                print(f"\n  {ui.GRAY}No AI model. Type 'install-model' to add one.{ui.RESET}\n")
+                installed = list_installed_models()
+                if installed:
+                    for m in installed:
+                        print(f"\n  {ui.GREEN}✔ {m['name']} ({m['actual_size_mb']}MB) — active{ui.RESET}\n")
+                else:
+                    print(f"\n  {ui.GRAY}No AI configured. Type 'ai-setup' to set up.{ui.RESET}\n")
             continue
 
         # Inline explain
