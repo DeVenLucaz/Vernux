@@ -4,6 +4,28 @@ This file explains every update in simple language, no coding knowledge needed.
 
 ---
 
+## v0.8.0 — Use Any AI — 30 May 2026
+
+### What's new
+
+- **You can now use any AI service with VERNUX — not just a local model.** Previously, the only way to get AI fallback working was to download a GGUF model to your phone (hundreds of megabytes) and hope it worked with your version of llama.cpp. Now you can connect VERNUX to any AI API — OpenAI (ChatGPT), Google Gemini, xAI Grok, Anthropic Claude, OpenRouter, Groq, Mistral, or your own local AI server — and it works instantly, no model download needed.
+
+- **New command: `ai-setup`.** Type `ai-setup` (or `vernux ai-setup`) to open the setup wizard. It shows you a list of supported providers, where to get a key for each one, and walks you through the connection. The whole thing takes about 30 seconds.
+
+- **Your API key is stored privately on your device.** Before asking for your key, VERNUX shows you a privacy notice explaining exactly where it gets saved (`~/.vernux/api_keys.json`), that only you can read that file, and that your key never goes anywhere except the provider you choose. VERNUX is open source — you can verify this. The notice only appears once. You can remove your key at any time by running `ai-setup` again and choosing "Remove API config".
+
+- **OpenRouter and Groq both have free tiers.** If you don't want to pay, OpenRouter has free models available (like Mistral 7B), and Groq offers fast free inference on Llama 3. You can get started without spending anything.
+
+### What was fixed
+
+- **The local AI fallback was unreliable on Android.** For a long time, the local AI in VERNUX had problems: sometimes it would print its entire startup screen into your terminal, sometimes it would return nothing at all, and sometimes the AI's answer would get cut off or garbled. This happened because different versions of the llama.cpp tool (which runs the AI model) behave differently on Android. The fix was to replace the local AI engine entirely with the one from [llamdrop](https://github.com/ypatole035-ai/llamdrop) — a separate project that was specifically built to handle all these Android/llama.cpp quirks. It's been tested across many device types and build versions.
+
+- **If you already have llamdrop installed, everything just works.** VERNUX now uses llamdrop's binary and models directly — no duplication. If you have a model downloaded in llamdrop, VERNUX sees it automatically.
+
+- **The loading spinner no longer freezes while the AI is thinking.** It used to stop animating when the model was running. Now it stays smooth.
+
+---
+
 ## v0.7.6 — Recipe Preview — 28 May 2026
 
 ### What was fixed
